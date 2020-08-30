@@ -12,3 +12,6 @@ by so doing transform code that was written as hardware banging code into more s
 
 AGA / OCS is not that useful to emulate, bitter and copper and so can be replaced by other code, 
 pretty easy, at least if your working with a open source 680x0 program.
+
+GPL2 was choices because UAE uses GPL2, but its possible this might change, depending on dependency’s, what emulation its going to be based on.
+

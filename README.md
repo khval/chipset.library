@@ -9,3 +9,6 @@ What I like to have in this library is, PAULA, CIAA/CIAB chip emulation, and pos
 
 Once the API is in place, I plan to make some 680x0 macros that can be inserted into existing 680x0 code where normally wrote direct to chipset, 
 by so doing transform code that was written as hardware banging code into more system friendly code, that is easier to deal with, with out major rewrite problem we have now.
+
+AGA / OCS is not that useful to emulate, bitter and copper and so can be replaced by other code, 
+pretty easy, at least if your working with a open source 680x0 program.

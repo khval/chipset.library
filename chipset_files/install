@@ -1,0 +1,10 @@
+copy /include/#? sdk:Include/include_h/ all
+
+IF EXISTS chipset.library
+copy chipset.library libs:
+avail flush
+else
+echo chipset.library not found
+endif
+
+

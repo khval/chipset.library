@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE library SYSTEM "library.dtd">
+<library name="chipset" basename="chipsetBase" openname="chipset.library">
+	<include>exec/types.h</include>
+	<include>libraries/chipset.h</include>
+	<interface name="main" version="1.0" struct="chipsetIFace" prefix="_chipset_" asmprefix="Ichipset" global="Ichipset">
+		<method name="Obtain" result="ULONG"/>
+		<method name="Release" result="ULONG"/>
+		<method name="Expunge" result="void" status="unimplemented"/>
+		<method name="Clone" result="struct Interface *" status="unimplemented"/>
+		<method name="allocChip" result="char *">
+			<arg name="size" type="uint32_t"/>
+		</method>
+		<method name="freeChip" result="void">
+			<arg name="mem" type="void *"/>
+		</method>
+		<method name="hostAddressToChip" result="void *">
+			<arg name="adr" type="void *"/>
+		</method>
+		<method name="chipAddressToHost" result="void">
+			<arg name="adr" type="void *"/>
+		</method>
+		<method name="writeChip" result="void">
+			<arg name="offset" type="ULONG"/>
+			<arg name="value" type="ULONG"/>
+		</method>
+		<method name="readChip" result="ULONG">
+			<arg name="offset" type="ULONG"/>
+		</method>
+	</interface>
+</library>
+

@@ -1,0 +1,21 @@
+
+INC = -I../ -I./ -Itests/
+
+do = tests/mem.c
+
+OBJS = $(do:.c=.exe)
+
+all:	$(OBJS)
+	@echo $(OBJS)
+
+%.exe: %.c
+	$(CC) $(LINK) $(INC)  $(@:.exe=.c) -o $@
+
+%.o:		%.c 
+	gcc  -Wall -O3  $(INC) -c  -D__USE_INLINE__ -D__no_stdlib__ $(@:.o=.c) -o $@
+
+tests/mem.exe: micro_sys/memory.o tests/mem.c
+	$(CC) $(LINK) $(INC) micro_sys/memory.o $(@:.exe=.c) -o $@
+
+clean:
+	delete tests/#?.exe

@@ -29,13 +29,16 @@ TARGET = chipset.library
 # Additional linker libraries
 LIBS = 
 
+INC = -I../ -I./
+
 # Version of the library to build
 VERSION = 53
 
 # "main" Interface Source Files
 main_SRCS = main/Obtain.c main/Release.c main/allocChip.c main/freeChip.c \
-    main/hostAddressToChip.c main/chipAddressToHost.c main/writeChip.c \
-    main/readChip.c 
+	main/hostAddressToChip.c main/chipAddressToHost.c main/writeChip.c \
+	main/readChip.c  \
+	micro_sys/memory.c
 
 # -------------------------------------------------------------
 # Nothing should need changing below this line
@@ -46,6 +49,9 @@ OBJS = $(main_SRCS:.c=.o)  $(SRCS:.c=.o)
 # Rules for building
 $(TARGET): $(OBJS)
 	$(CC) $(LINK) -nostartfiles -o $(TARGET) $(OBJS) $(LIBS)
+
+micro_sys/memory.o: micro_sys/memory.h micro_sys/memory.c 
+	$(CC) $(LINK) $(INC) -c $(@:.o=.c) -o $@
 
 .PHONY: clean
 clean:

@@ -51,7 +51,7 @@ unsigned int gui_ledstate;
 int gui_ledstate_forced = 0;
 
 static unsigned long ciaala,ciaalb,ciabla,ciablb;
-static int ciaatodon, ciabtodon;
+int ciaatodon, ciabtodon;
 static unsigned int ciaaprb,ciaadra,ciaadrb,ciaasdr;
 static unsigned int ciabprb,ciabdra,ciabdrb,ciabsdr;
 static int div10;
@@ -98,10 +98,12 @@ static void RethinkICRB(void)
 
 static int lastdiv10;
 
-static void CIA_update(void)
+static void CIA_update(void) // used by cia_handler
 {
     unsigned long int ccount = cycles - eventtab[ev_cia].oldcycles + lastdiv10;
     unsigned long int ciaclocks = ccount / DIV10;
+
+	printf("ccount %d, ciaclocks: %d\n",ccount, ciaclocks);
 
     int aovfla = 0, aovflb = 0, bovfla = 0, bovflb = 0;
 
@@ -366,7 +368,7 @@ static uae_u8 ReadCIAB(unsigned int addr)
     return 0;
 }
 
-static void WriteCIAA(uae_u16 addr,uae_u8 val)
+void WriteCIAA(uae_u16 addr,uae_u8 val)
 {
     int oldled, oldovl;
     switch(addr & 0xf) {
@@ -511,7 +513,7 @@ static void WriteCIAA(uae_u16 addr,uae_u8 val)
     }
 }
 
-static void WriteCIAB(uae_u16 addr,uae_u8 val)
+void WriteCIAB(uae_u16 addr,uae_u8 val)
 {
     int oldval;
     switch(addr & 0xf) {

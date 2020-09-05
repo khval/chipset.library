@@ -18,6 +18,6 @@ struct mem_list
 	int allocated;
 };
 
-
+char *allocChip(uint32_t size);
 
 

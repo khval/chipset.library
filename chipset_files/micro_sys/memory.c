@@ -55,7 +55,7 @@ int find_free_blocks(int blocks)
 	return -1;
 }
 
-void *allocChip(uint32_t size)
+char *allocChip(uint32_t size)
 {
 	// 8 = 256
 	// 9 = 512
@@ -100,7 +100,7 @@ void freeChip(void *adr)
 
 	for (n=0;n<mem_list.used;n++)
 	{
-		printf("[%d]=%08x\n",n,mem_list.allocted_tab[n].start);
+		printf("[%d]=%08x\n",n, (uint32_t) mem_list.allocted_tab[n].start);
 
 		if (mem_list.allocted_tab[n].start == adr  )
 		{

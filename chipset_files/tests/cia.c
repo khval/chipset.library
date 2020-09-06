@@ -55,32 +55,45 @@ bool pause = false;
 // 1/ 709378.92 = 1,4 us
 // 1/ 50 is  20 ms period 
 
-// #define _50Hz_period_us 10.0f
-
 #define _50Hz_period_us 20000.0f
 
-float cia_time_us = 100000.0f / 70938.92f;
-float cia_time_us_cnt = 0;
+double cia_time_us = 100000.0f / 70938.92f;
+double _50Hz_period_us_cnt = 0;
+
+// 240 scanlines for PAL screen
+// 224 scanline for NTSC.
+
+#define hsync_period_us (20000.0f / 240.0f)
+double hsync_period_us_cnt = 0;
 
 void do_cia()
 {
 	// We call this like every 10 cpu cycles, (Amiga500)
 	cycles += 10;	
 
-	cia_time_us_cnt += cia_time_us;
+	_50Hz_period_us_cnt += cia_time_us;
+	hsync_period_us_cnt += cia_time_us;
 
-	printf("cia_time_us_cnt: %0.0f us\n",cia_time_us_cnt);
+	printf("hsync_period_us_cnt: %0.3f\n", hsync_period_us_cnt);
 
-	CIA_handler();	// we should run this every CIA Clock.... I think...
+	CIA_handler();	// this function process cpu cycles
+
 	//	and trigger CIA_hsync_handler every 50 tick.
 
-	if (cia_time_us_cnt >= _50Hz_period_us) 
+	if (hsync_period_us_cnt >= hsync_period_us)
+	{
+		printf("trigger hsync\n");
+		CIA_hsync_handler();
+		hsync_period_us_cnt -= hsync_period_us;
+	}
+
+	if (_50Hz_period_us_cnt >= _50Hz_period_us) 
 	{	
 		printf("trigger vsync\n");
 		CIA_vsync_handler();
 		pause = true;
 
-		cia_time_us_cnt -= _50Hz_period_us;	// 20 ms.
+		_50Hz_period_us_cnt -= _50Hz_period_us;	// 20 ms.
 	}
 } 
 

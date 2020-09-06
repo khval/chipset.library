@@ -62,28 +62,39 @@ bool pause = false;
 #define _50Hz_period_us 20000.0f
 
 float cia_time_us = 100000.0f / 70938.92f;
-float cia_time_us_cnt = 0;
+double _50Hz_period_us_cnt = 0;
+
+// 240 scanlines for PAL screen
+// 224 scanline for NTSC.
+
+#define hsync_period_us (20000.0f / 240.0f)
+double hsync_period_us_cnt = 0;
 
 struct timeval mstart, mend;
 struct timeval start, end;
 
 void do_cia( float delta_us )
 {
-	cia_time_us_cnt += delta_us;
+	_50Hz_period_us_cnt += delta_us;
+	hsync_period_us_cnt += delta_us;
 
-	CIA_handler();	// we should run this every CIA Clock.... I think...
-	//	and trigger CIA_hsync_handler every 50 tick.
+	CIA_handler();	// this function process cpu cycles
 
-	if (cia_time_us_cnt >= _50Hz_period_us) 
+	while (hsync_period_us_cnt >= hsync_period_us)
+	{
+		CIA_hsync_handler();
+		hsync_period_us_cnt -= hsync_period_us;
+	}
+
+	if (_50Hz_period_us_cnt >= _50Hz_period_us) 
 	{	
 		printf("trigger vsync\n");
 		CIA_vsync_handler();
 		pause = true;
 
-		cia_time_us_cnt -= _50Hz_period_us;	// 20 ms.
+		_50Hz_period_us_cnt -= _50Hz_period_us;	// 20 ms.
 	}
 } 
-
 
 #define run_for (3*50)
 
@@ -141,6 +152,11 @@ int main()
 
 	WriteCIAA( 0xF , 0x04 );
 	WriteCIAA( 0x8 , 0x00 );
+
+	// enable ciabtod
+
+	WriteCIAB( 0xF , 0x04 );
+	WriteCIAB( 0x8 , 0x00 );
 
 	printf("ciaatod: %s\n", ciaatodon ? "On" : "Off");
 	printf("ciabtod: %s\n", ciabtodon ? "On" : "Off");

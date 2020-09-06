@@ -4,7 +4,8 @@ INC = -I../ -I./ -Itests/
 
 
 do = tests/mem.c \
-	tests/cia.c
+	tests/cia.c \
+	tests/cia2.c
 
 OBJS = $(do:.c=.exe)
 
@@ -25,6 +26,9 @@ tests/mem.exe: micro_sys/memory.o tests/mem.c
 
 tests/cia.exe: uade/cia.o tests/cia.c
 	$(CC) $(LINK) $(INC) uade/cia.o $(@:.exe=.c) -o $@
+
+tests/cia2.exe: uade/cia.o timer_device.o tests/cia2.c
+	$(CC) $(LINK) $(INC) uade/cia.o timer_device.o $(@:.exe=.c) -o $@
 
 clean:
 	delete tests/#?.exe

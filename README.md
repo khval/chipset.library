@@ -17,4 +17,4 @@ GPL2 was choices because UAE uses GPL2, but its possible this might change, depe
 
 # Disclaimer:
 
-This project contains work from other projects with other open source licenses, LGPL allows you only link dynamically to the files under LGPL license, other files are under other licenses, where some do not allow commercial, and some do. other file in this project file contains a copyright in the header files, you should referee to lienees of this files, if you like to use this files in a different way then intended in other projects.
+This project contains work from other projects with other open source licenses, LGPL allows you only open / link dynamically to the files under the LGPL license, other files are under other licenses, where some do not allow commercial, and some do. other file in this project file contains a copyright in the header files, you should referee to lienees of this files, if you like to use this files in a different way other then intended in other projects.

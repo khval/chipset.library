@@ -15,3 +15,6 @@ pretty easy, at least if your working with a open source 680x0 program.
 
 GPL2 was choices because UAE uses GPL2, but its possible this might change, depending on dependency’s, what emulation its going to be based on.
 
+# Disclaimer:
+
+This project contains work from other projects with other open source licenses, LGPL allows you only link dynamically to the files under LGPL license, other files are under other licenses, where some do not allow commercial, and some do. other file in this project file contains a copyright in the header files, you should referee to lienees of this files, if you like to use this files in a different way then intended in this project.

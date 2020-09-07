@@ -17,6 +17,8 @@
     USA
  */
 
+#define __USE_INLINE__
+
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -55,9 +57,11 @@ bool pause = false;
 // 1/ 709378.92 = 1,4 us
 // 1/ 50 is  20 ms period 
 
+// #define _50Hz_period_us 10.0f
+
 #define _50Hz_period_us 20000.0f
 
-double cia_time_us = 100000.0f / 70938.92f;
+float cia_time_us = 100000.0f / 70938.92f;
 double _50Hz_period_us_cnt = 0;
 
 // 240 scanlines for PAL screen
@@ -66,23 +70,18 @@ double _50Hz_period_us_cnt = 0;
 #define hsync_period_us (20000.0f / 240.0f)
 double hsync_period_us_cnt = 0;
 
-void do_cia()
+struct timeval mstart, mend;
+struct timeval start, end;
+
+void do_cia( float delta_us )
 {
-	// We call this like every 10 cpu cycles, (Amiga500)
-	cycles += 10;	
-
-	_50Hz_period_us_cnt += cia_time_us;
-	hsync_period_us_cnt += cia_time_us;
-
-	printf("hsync_period_us_cnt: %0.3f\n", hsync_period_us_cnt);
+	_50Hz_period_us_cnt += delta_us;
+	hsync_period_us_cnt += delta_us;
 
 	CIA_handler();	// this function process cpu cycles
 
-	//	and trigger CIA_hsync_handler every 50 tick.
-
-	if (hsync_period_us_cnt >= hsync_period_us)
+	while (hsync_period_us_cnt >= hsync_period_us)
 	{
-		printf("trigger hsync\n");
 		CIA_hsync_handler();
 		hsync_period_us_cnt -= hsync_period_us;
 	}
@@ -97,26 +96,53 @@ void do_cia()
 	}
 } 
 
-
 #define run_for (3*50)
 
 void do_pause()
 {
 	if (pause)	
 	{
+		dumpcia();
 		getchar();
 		pause = false;
+
+		gettimeofday(&end,NULL);
 	}
 }
 
 extern int ciaatodon;
 extern int ciabtodon;
 
+
+struct MsgPort			*TimerMP = NULL;
+struct TimeRequest		*TimerIO = NULL;
+int 					timer_device_open = 0;
+
+void setTimerIO()
+{
+	TimerIO->Request.io_Command = TR_ADDREQUEST;
+	TimerIO->Time.Seconds = 0;
+	TimerIO->Time.Microseconds = 1;
+	DoIO(TimerIO);
+}
+
+
+void init_timer_device();
+void close_timer_device();
+
 int main()
 {
 	int r;
 	void *stderr_backup = stderr;
-	stderr = stdout;
+	int microseconds;
+	int count;
+	float delta_us = 0;
+
+//	stderr = stdout;
+
+	init_timer_device();
+
+	if (timer_device_open==FALSE) return -1;
 
 	printf("cia_time_us: %0.3f\n",cia_time_us);
 	getchar();
@@ -124,22 +150,47 @@ int main()
 
 	// enable ciaatod
 
-	WriteCIAA( 0xF , 0x00 );
+	WriteCIAA( 0xF , 0x04 );
 	WriteCIAA( 0x8 , 0x00 );
+
+	// enable ciabtod
+
+	WriteCIAB( 0xF , 0x04 );
+	WriteCIAB( 0x8 , 0x00 );
 
 	printf("ciaatod: %s\n", ciaatodon ? "On" : "Off");
 	printf("ciabtod: %s\n", ciabtodon ? "On" : "Off");
 
+	gettimeofday(&mstart,NULL);
+	gettimeofday(&start,NULL);
 
-	for (r=0;r<run_for;r++)
+	microseconds = 0;
+
+	do
 	{
-		printf("event: %d\n",r);
-		do_cia();
-		dumpcia();
+		setTimerIO();
+		gettimeofday(&end,NULL);
+
+		microseconds += (double) ((end.tv_usec - start.tv_usec) + (end.tv_sec - start.tv_sec) * 1000000);
+		count = (int) (microseconds / cia_time_us);
+		microseconds-= cia_time_us * (double) count; 
+
+		// 1 cia time = 10 cpu cycles, (Amiga500)
+		cycles+=(10 *count);
+
+		do_cia(cia_time_us * count);
 		do_pause();
-	}
+		start = end;
+
+		gettimeofday(&mend,NULL);
+ 
+	} while (  (mend.tv_sec - mstart.tv_sec) < 10 );
+
+	printf("sec: %d\n", mend.tv_sec - mstart.tv_sec);
 
 	stderr = stderr_backup;
+
+	close_timer_device();
 
 	return 0;
 }

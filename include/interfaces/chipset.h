@@ -37,10 +37,10 @@ struct chipsetIFace
 	struct Interface * APICALL (*Clone)(struct chipsetIFace *Self);
 	char * APICALL (*allocChip)(struct chipsetIFace *Self, uint32_t size);
 	void APICALL (*freeChip)(struct chipsetIFace *Self, void * mem);
-	void * APICALL (*hostAddressToChip)(struct chipsetIFace *Self, void * adr);
-	void APICALL (*chipAddressToHost)(struct chipsetIFace *Self, void * adr);
-	void APICALL (*writeChip)(struct chipsetIFace *Self, ULONG offset, ULONG value);
-	ULONG APICALL (*readChip)(struct chipsetIFace *Self, ULONG offset);
+	char * APICALL (*hostAddressToChip)(struct chipsetIFace *Self, char * adr);
+	char * APICALL (*chipAddressToHost)(struct chipsetIFace *Self, char * adr);
+	void APICALL (*writeChip)(struct chipsetIFace *Self, char * offset, ULONG value);
+	ULONG APICALL (*readChip)(struct chipsetIFace *Self, char * offset);
 };
 
 #ifdef __cplusplus

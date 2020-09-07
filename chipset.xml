@@ -14,18 +14,18 @@
 		<method name="freeChip" result="void">
 			<arg name="mem" type="void *"/>
 		</method>
-		<method name="hostAddressToChip" result="void *">
-			<arg name="adr" type="void *"/>
+		<method name="hostAddressToChip" result="char *">
+			<arg name="adr" type="char *"/>
 		</method>
-		<method name="chipAddressToHost" result="void">
-			<arg name="adr" type="void *"/>
+		<method name="chipAddressToHost" result="char *">
+			<arg name="adr" type="char *"/>
 		</method>
 		<method name="writeChip" result="void">
-			<arg name="offset" type="ULONG"/>
+			<arg name="offset" type="char *"/>
 			<arg name="value" type="ULONG"/>
 		</method>
 		<method name="readChip" result="ULONG">
-			<arg name="offset" type="ULONG"/>
+			<arg name="offset" type="char *"/>
 		</method>
 	</interface>
 </library>

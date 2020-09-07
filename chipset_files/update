@@ -17,7 +17,7 @@ if exists chipset_files
 cd chipset_files/
 ; replace default text set by IDLTOOL
 rpl.exe -R "Hyperion Entertainment CVBA" "LiveForIt Software" >NIL:
-rpl.exe -R "All Rights Reserved" "GPL2 License." >NIL:
+rpl.exe -R "All Rights Reserved" "LGPL License." >NIL:
 endif 
 
 cd $olddir

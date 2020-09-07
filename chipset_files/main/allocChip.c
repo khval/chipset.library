@@ -55,6 +55,8 @@
 *
 */
 
+void *allocChip(ULONG size);
+
 char * _chipset_allocChip(struct chipsetIFace *Self,
        uint32_t size)
 {

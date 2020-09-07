@@ -22,6 +22,7 @@
 #include <exec/types.h>
 #include <libraries/chipset.h>
 #include <proto/chipset.h>
+#include "spawn.h"
 
 #include <stdarg.h>
 
@@ -36,6 +37,8 @@ struct _Library
     /* If you need more data fields, add them here */
 };
 
+char *chip_ram = NULL;
+
 struct ExecIFace *IExec UNUSED = NULL;
 
 struct NewlibIFace * INewlib = NULL;
@@ -44,6 +47,12 @@ struct DOSIFace *IDOS = NULL;
 struct Library *NewLibBase = NULL;
 struct Library *DOSBase = NULL;
 
+struct Task *main_task = NULL;	// main_task is whatever when running from a library
+struct Process *cia_process = NULL;
+
+int spawn_count;
+
+bool expunge_tasks = false;
 
 /*
  * The system (and compiler) rely on a symbol named _start which marks
@@ -64,38 +73,64 @@ int32 _start(void)
     return RETURN_FAIL;
 }
 
+extern void cia_process_fn ();
+
+#define __debug_cia__
+
+void __init_cia_process__()
+{
+#ifdef __debug_cia__
+	BPTR _out_ = IDOS -> FOpen("CON:",MODE_NEWFILE,0);
+#else
+	BPTR _out_ = 0;
+#endif
+
+	main_task = (struct Task *) IExec->FindTask(NULL);
+	cia_process = spawn( cia_process_fn, "CIA process", _out_ );
+}
 
 /* Open the library */
 STATIC struct Library *libOpen(struct LibraryManagerInterface *Self, ULONG version)
 {
-    struct _Library *libBase = (struct _Library *)Self->Data.LibBase; 
+	struct _Library *libBase = (struct _Library *)Self->Data.LibBase; 
 
-    if (version > VERSION)
-    {
-        return NULL;
-    }
+	if (version > VERSION)
+	{
+		return NULL;
+	}
 
-    /* Add any specific open code here 
-       Return 0 before incrementing OpenCnt to fail opening */
+	/* Add any specific open code here  Return 0 before incrementing OpenCnt to fail opening */
 
+	/* Add up the open count */
+	libBase->libNode.lib_OpenCnt++;
 
-    /* Add up the open count */
-    libBase->libNode.lib_OpenCnt++;
-    return (struct Library *)libBase;
+	if ( libBase->libNode.lib_OpenCnt == 1)
+	{
+		expunge_tasks = false;
+		__init_cia_process__();
+	}
 
+	return (struct Library *)libBase;
 }
 
 
 /* Close the library */
 STATIC APTR libClose(struct LibraryManagerInterface *Self)
 {
-    struct Library *libBase = (struct Library *)Self->Data.LibBase;
-    /* Make sure to undo what open did */
+	struct Library *libBase = (struct Library *)Self->Data.LibBase;
+	/* Make sure to undo what open did */
 
-    /* Make the close count */
-    ((struct Library *)libBase)->lib_OpenCnt--;
+	/* Make the close count */
+	((struct Library *)libBase)->lib_OpenCnt--;
 
-    return 0;
+	if ( ((struct Library *)libBase)->lib_OpenCnt == 0)
+	{
+		expunge_tasks = true;
+		main_task = (struct Task *) IExec->FindTask(NULL);
+		wait_spawns();
+	}
+
+	return 0;
 }
 
 #define close_lib(b,i)			\
@@ -126,8 +161,8 @@ STATIC APTR libExpunge(struct LibraryManagerInterface *Self)
 
 	close_libs();
 
-        IExec->Remove((struct Node *)libBase);
-        IExec->DeleteLibrary((struct Library *)libBase);
+	IExec->Remove((struct Node *)libBase);
+	IExec->DeleteLibrary((struct Library *)libBase);
     }
     else
     {
@@ -156,6 +191,7 @@ BOOL open_lib( const char *name, int ver , const char *iname, int iver, struct L
 	return (*interface) ? TRUE : FALSE;
 }
 
+
 BOOL init()
 {
 	if ( ! open_lib( "dos.library", 53L , "main", 1, &DOSBase, (struct Interface **) &IDOS  ) ) return FALSE;
@@ -163,6 +199,8 @@ BOOL init()
 
 	return TRUE;
 }
+
+struct _Library *libBase_debug = NULL;
 
 /* The ROMTAG Init Function */
 STATIC struct Library *libInit(struct Library *LibraryBase, APTR seglist, struct Interface *exec)
@@ -186,6 +224,8 @@ STATIC struct Library *libInit(struct Library *LibraryBase, APTR seglist, struct
 		close_libs();
 		return NULL;
 	}
+
+	libBase_debug = libBase;
 
        return (struct Library *)libBase;
 }

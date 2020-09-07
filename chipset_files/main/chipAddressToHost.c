@@ -55,9 +55,10 @@
 *
 */
 
-void _chipset_chipAddressToHost(struct chipsetIFace *Self,
-       void * adr)
+char *chipAddressToHost(char *adr);
+
+void *_chipset_chipAddressToHost(struct chipsetIFace *Self,  void * adr)
 {
-  chipAddressToHost(adr);
+	return chipAddressToHost(adr);
 }
 

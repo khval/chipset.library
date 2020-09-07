@@ -55,9 +55,11 @@
 *
 */
 
+ULONG readChip(char *offset);
+
 ULONG _chipset_readChip(struct chipsetIFace *Self,
        ULONG offset)
 {
-  return readChip(offset);
+	return readChip(offset);
 }
 

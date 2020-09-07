@@ -103,8 +103,6 @@ static void CIA_update(void) // used by cia_handler
     unsigned long int ccount = cycles - eventtab[ev_cia].oldcycles + lastdiv10;
     unsigned long int ciaclocks = ccount / DIV10;
 
-	printf("ccount %d, ciaclocks: %d\n",ccount, ciaclocks);
-
     int aovfla = 0, aovflb = 0, bovfla = 0, bovflb = 0;
 
     lastdiv10 = div10;

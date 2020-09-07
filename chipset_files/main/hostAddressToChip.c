@@ -55,6 +55,8 @@
 *
 */
 
+char *hostAddressToChip(char *adr);
+
 void * _chipset_hostAddressToChip(struct chipsetIFace *Self,
        void * adr)
 {

@@ -38,7 +38,12 @@ VERSION = 53
 main_SRCS = main/Obtain.c main/Release.c main/allocChip.c main/freeChip.c \
 	main/hostAddressToChip.c main/chipAddressToHost.c main/writeChip.c \
 	main/readChip.c  \
-	micro_sys/memory.c
+	micro_sys/memory.c \
+	uade/cia.c \
+	cia_process.c \
+	timer_device.c \
+	spawn.c \
+	dummy.c
 
 # -------------------------------------------------------------
 # Nothing should need changing below this line
@@ -52,6 +57,9 @@ $(TARGET): $(OBJS)
 
 micro_sys/memory.o: micro_sys/memory.h micro_sys/memory.c 
 	$(CC) $(LINK) $(INC) -c $(@:.o=.c) -o $@
+
+uade/cia.o:		uade/cia.c 
+	gcc  -Wall -O3  $(INC) $(OPT) -c  -D__USE_INLINE__ -D__no_stdlib__ $(@:.o=.c) -o $@
 
 .PHONY: clean
 clean:

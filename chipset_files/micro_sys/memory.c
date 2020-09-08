@@ -73,7 +73,7 @@ int find_free_blocks(int blocks)
 	return -1;
 }
 
-char *allocChip(uint32_t size)
+char *_allocChip(uint32_t size)
 {
 	// 8 = 256
 	// 9 = 512
@@ -112,7 +112,7 @@ char *allocChip(uint32_t size)
 }
 
 
-void freeChip(void *adr)
+void _freeChip(void *adr)
 {
 	int n;
 

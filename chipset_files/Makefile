@@ -31,19 +31,28 @@ LIBS =
 
 INC = -I../ -I./
 
+
+OPT = -DNO_INLINE_MEMORY_ACCESS
+
 # Version of the library to build
 VERSION = 53
 
 # "main" Interface Source Files
 main_SRCS = main/Obtain.c main/Release.c main/allocChip.c main/freeChip.c \
-	main/hostAddressToChip.c main/chipAddressToHost.c main/writeChip.c \
-	main/readChip.c  \
+	main/hostAddressToChip.c main/chipAddressToHost.c  \
+	main/writeChipLong.c \
+	main/writeChipWord.c \
+	main/writeChipByte.c \
+	main/readChipLong.c  \
+	main/readChipWord.c  \
+	main/readChipByte.c  \
 	micro_sys/memory.c \
 	uade/cia.c \
+	uade/memory.c \
 	cia_process.c \
 	timer_device.c \
 	spawn.c \
-	dummy.c
+	mem_api.c
 
 # -------------------------------------------------------------
 # Nothing should need changing below this line
@@ -58,7 +67,16 @@ $(TARGET): $(OBJS)
 micro_sys/memory.o: micro_sys/memory.h micro_sys/memory.c 
 	$(CC) $(LINK) $(INC) -c $(@:.o=.c) -o $@
 
+main/%.o:		main/%.c 
+	gcc  -Wall -O3  $(INC) $(OPT) -c  -D__USE_INLINE__ -D__no_stdlib__ $(@:.o=.c) -o $@
+
 uade/cia.o:		uade/cia.c 
+	gcc  -Wall -O3  $(INC) $(OPT) -c  -D__USE_INLINE__ -D__no_stdlib__ $(@:.o=.c) -o $@
+
+uade/memory.o:		uade/memory.c 
+	gcc  -Wall -O3  $(INC) $(OPT) -c  -D__USE_INLINE__ -D__no_stdlib__ $(@:.o=.c) -o $@
+
+mem_api.o:		mem_api.c 
 	gcc  -Wall -O3  $(INC) $(OPT) -c  -D__USE_INLINE__ -D__no_stdlib__ $(@:.o=.c) -o $@
 
 .PHONY: clean

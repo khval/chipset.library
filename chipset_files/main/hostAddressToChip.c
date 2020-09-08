@@ -24,7 +24,6 @@
 #include <dos/dos.h>
 #include <exec/types.h>
 #include <libraries/chipset.h>
-#include <proto/chipset.h>
 #include <stdarg.h>
 
 /****** chipset/main/hostAddressToChip ******************************************
@@ -55,11 +54,8 @@
 *
 */
 
-char *hostAddressToChip(char *adr);
-
-void * _chipset_hostAddressToChip(struct chipsetIFace *Self,
-       void * adr)
+void * _chipset_hostAddressToChip(struct chipsetIFace *Self, void * adr)
 {
-  return hostAddressToChip(adr);
+	return _hostAddressToChip(adr);
 }
 

@@ -13,8 +13,12 @@ STATIC CONST APTR main_v1_vectors[] =
     _chipset_freeChip,
     _chipset_hostAddressToChip,
     _chipset_chipAddressToHost,
-    _chipset_writeChip,
-    _chipset_readChip,
+    _chipset_writeChipLong,
+    _chipset_writeChipWord,
+    _chipset_writeChipByte,
+    _chipset_readChipLong,
+    _chipset_readChipWord,
+    _chipset_readChipByte,
     (APTR)-1
 };
 

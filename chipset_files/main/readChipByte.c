@@ -17,30 +17,36 @@
     USA
  */
 
-#include <stdlib.h>
+
 #include <stdint.h>
+#include <stdarg.h>
+
 #include <exec/exec.h>
 #include <proto/exec.h>
 #include <dos/dos.h>
 #include <exec/types.h>
 #include <libraries/chipset.h>
-#include <stdarg.h>
+#include <proto/chipset.h>
 
-/****** chipset/main/freeChip ******************************************
+#include "../uade/sysconfig.h"
+#include "../uade/sysdeps.h"
+#include "../uade/memory.h"
+
+/****** chipset/main/readChipByte ******************************************
 *
 *   NAME
-*      freeChip -- Description
+*      readChipByte -- Description
 *
 *   SYNOPSIS
-*      void freeChip(void * mem);
+*      ULONG readChipByte(char * offset);
 *
 *   FUNCTION
 *
 *   INPUTS
-*       mem - 
+*       offset - 
 *
 *   RESULT
-*       This function does not return a result
+*       The result ...
 *
 *   EXAMPLE
 *
@@ -54,9 +60,9 @@
 *
 */
 
-void _chipset_freeChip(struct chipsetIFace *Self,
-       void * mem)
+ULONG _chipset_readChipByte(struct chipsetIFace *Self,
+       char * offset)
 {
-	_freeChip(mem);
+  return byteget(offset);
 }
 

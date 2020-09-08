@@ -39,8 +39,12 @@ struct chipsetIFace
 	void APICALL (*freeChip)(struct chipsetIFace *Self, void * mem);
 	char * APICALL (*hostAddressToChip)(struct chipsetIFace *Self, char * adr);
 	char * APICALL (*chipAddressToHost)(struct chipsetIFace *Self, char * adr);
-	void APICALL (*writeChip)(struct chipsetIFace *Self, char * offset, ULONG value);
-	ULONG APICALL (*readChip)(struct chipsetIFace *Self, char * offset);
+	void APICALL (*writeChipLong)(struct chipsetIFace *Self, char * offset, ULONG value);
+	void APICALL (*writeChipWord)(struct chipsetIFace *Self, char * offset, ULONG value);
+	void APICALL (*writeChipByte)(struct chipsetIFace *Self, char * offset, ULONG value);
+	ULONG APICALL (*readChipLong)(struct chipsetIFace *Self, char * offset);
+	ULONG APICALL (*readChipWord)(struct chipsetIFace *Self, char * offset);
+	ULONG APICALL (*readChipByte)(struct chipsetIFace *Self, char * offset);
 };
 
 #ifdef __cplusplus

@@ -24,7 +24,6 @@
 #include <dos/dos.h>
 #include <exec/types.h>
 #include <libraries/chipset.h>
-#include <proto/chipset.h>
 #include <stdarg.h>
 
 /****** chipset/main/allocChip ******************************************
@@ -55,11 +54,8 @@
 *
 */
 
-void *allocChip(ULONG size);
-
-char * _chipset_allocChip(struct chipsetIFace *Self,
-       uint32_t size)
+char * _chipset_allocChip(struct chipsetIFace *Self,  uint32_t size)
 {
-  return allocChip(size);
+	return _allocChip(size);
 }
 

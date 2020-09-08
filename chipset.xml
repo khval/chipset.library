@@ -20,11 +20,25 @@
 		<method name="chipAddressToHost" result="char *">
 			<arg name="adr" type="char *"/>
 		</method>
-		<method name="writeChip" result="void">
+		<method name="writeChipLong" result="void">
 			<arg name="offset" type="char *"/>
 			<arg name="value" type="ULONG"/>
 		</method>
-		<method name="readChip" result="ULONG">
+		<method name="writeChipWord" result="void">
+			<arg name="offset" type="char *"/>
+			<arg name="value" type="ULONG"/>
+		</method>
+		<method name="writeChipByte" result="void">
+			<arg name="offset" type="char *"/>
+			<arg name="value" type="ULONG"/>
+		</method>
+		<method name="readChipLong" result="ULONG">
+			<arg name="offset" type="char *"/>
+		</method>
+		<method name="readChipWord" result="ULONG">
+			<arg name="offset" type="char *"/>
+		</method>
+		<method name="readChipByte" result="ULONG">
 			<arg name="offset" type="char *"/>
 		</method>
 	</interface>

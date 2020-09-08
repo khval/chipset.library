@@ -21,5 +21,9 @@ extern char *               VARARGS68K _chipset_allocChip(struct chipsetIFace *,
 extern void                 VARARGS68K _chipset_freeChip(struct chipsetIFace *, void * mem);
 extern char *               VARARGS68K _chipset_hostAddressToChip(struct chipsetIFace *, char * adr);
 extern char *               VARARGS68K _chipset_chipAddressToHost(struct chipsetIFace *, char * adr);
-extern void                 VARARGS68K _chipset_writeChip(struct chipsetIFace *, char * offset, ULONG value);
-extern ULONG                VARARGS68K _chipset_readChip(struct chipsetIFace *, char * offset);
+extern void                 VARARGS68K _chipset_writeChipLong(struct chipsetIFace *, char * offset, ULONG value);
+extern void                 VARARGS68K _chipset_writeChipWord(struct chipsetIFace *, char * offset, ULONG value);
+extern void                 VARARGS68K _chipset_writeChipByte(struct chipsetIFace *, char * offset, ULONG value);
+extern ULONG                VARARGS68K _chipset_readChipLong(struct chipsetIFace *, char * offset);
+extern ULONG                VARARGS68K _chipset_readChipWord(struct chipsetIFace *, char * offset);
+extern ULONG                VARARGS68K _chipset_readChipByte(struct chipsetIFace *, char * offset);

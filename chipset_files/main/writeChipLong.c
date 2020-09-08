@@ -17,27 +17,34 @@
     USA
  */
 
-#include <stdlib.h>
+
 #include <stdint.h>
+#include <stdarg.h>
+
 #include <exec/exec.h>
 #include <proto/exec.h>
 #include <dos/dos.h>
 #include <exec/types.h>
 #include <libraries/chipset.h>
-#include <stdarg.h>
+#include <proto/chipset.h>
 
-/****** chipset/main/freeChip ******************************************
+#include "../uade/sysconfig.h"
+#include "../uade/sysdeps.h"
+#include "../uade/memory.h"
+
+/****** chipset/main/writeChipLong ******************************************
 *
 *   NAME
-*      freeChip -- Description
+*      writeChipLong -- Description
 *
 *   SYNOPSIS
-*      void freeChip(void * mem);
+*      void writeChipLong(char * offset, ULONG value);
 *
 *   FUNCTION
 *
 *   INPUTS
-*       mem - 
+*       offset - 
+*       value - 
 *
 *   RESULT
 *       This function does not return a result
@@ -54,9 +61,8 @@
 *
 */
 
-void _chipset_freeChip(struct chipsetIFace *Self,
-       void * mem)
+void _chipset_writeChipLong(struct chipsetIFace *Self, char * offset, ULONG value)
 {
-	_freeChip(mem);
+	longput(offset, value);
 }
 

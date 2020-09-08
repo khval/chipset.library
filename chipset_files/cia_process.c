@@ -15,8 +15,6 @@ unsigned long int cycles = 0;
 struct ev eventtab[ev_max];
 unsigned long int nextevent =0 ;
 int custom_bank = 0;
-int default_xlate = 0;
-int default_check = 0;
 
 
 //CIA_hsync_handler();

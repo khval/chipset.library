@@ -18,8 +18,12 @@ STRUCTURE chipsetIFace, InterfaceData_SIZE
 	    FPTR Ichipset_freeChip
 	    FPTR Ichipset_hostAddressToChip
 	    FPTR Ichipset_chipAddressToHost
-	    FPTR Ichipset_writeChip
-	    FPTR Ichipset_readChip
+	    FPTR Ichipset_writeChipLong
+	    FPTR Ichipset_writeChipWord
+	    FPTR Ichipset_writeChipByte
+	    FPTR Ichipset_readChipLong
+	    FPTR Ichipset_readChipWord
+	    FPTR Ichipset_readChipByte
 	LABEL chipsetIFace_SIZE
 
 #endif

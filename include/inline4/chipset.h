@@ -30,7 +30,11 @@
 #define freeChip(mem) Ichipset->freeChip((mem)) 
 #define hostAddressToChip(adr) Ichipset->hostAddressToChip((adr)) 
 #define chipAddressToHost(adr) Ichipset->chipAddressToHost((adr)) 
-#define writeChip(offset, value) Ichipset->writeChip((offset), (value)) 
-#define readChip(offset) Ichipset->readChip((offset)) 
+#define writeChipLong(offset, value) Ichipset->writeChipLong((offset), (value)) 
+#define writeChipWord(offset, value) Ichipset->writeChipWord((offset), (value)) 
+#define writeChipByte(offset, value) Ichipset->writeChipByte((offset), (value)) 
+#define readChipLong(offset) Ichipset->readChipLong((offset)) 
+#define readChipWord(offset) Ichipset->readChipWord((offset)) 
+#define readChipByte(offset) Ichipset->readChipByte((offset)) 
 
 #endif /* INLINE4_CHIPSET_H */

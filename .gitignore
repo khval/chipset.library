@@ -4,3 +4,5 @@
 chipset_files/a.out
 
 *.exe
+
+chipset_files/chipset.library

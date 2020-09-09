@@ -1,5 +1,6 @@
 
 #include <stdint.h>
+#include <stdbool.h>
 #include <proto/exec.h>
 
 #include "uade/sysconfig.h"
@@ -7,6 +8,9 @@
 #include "uade/memory.h"
 
 extern uae_u8 *chipmemory ;
+
+extern bool init_mem();
+extern void cleanup_mem();
 
 BOOL setup_mem_banks()
 {
@@ -16,16 +20,14 @@ BOOL setup_mem_banks()
 	map_banks(&cia_bank, 0xA0,32 );
 	map_banks(&clock_bank, 0xDC,1 );
 
-	chipmemory = (uae_u8) malloc(512 * 1024);	// 0.5 mb 
-	if (chipmemory == NULL) return FALSE;
+	if (init_mem()==FALSE) return FALSE;
 
 	return TRUE;
 }
 
 void cleanup()
 {
-	if (chipmemory) free(chipmemory);
-	chipmemory = NULL;
+	cleanup_mem();
 }
 
 char *_hostAddressToChip(char *addr)

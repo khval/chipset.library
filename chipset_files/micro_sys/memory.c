@@ -20,6 +20,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <stdbool.h>
 #include "micro_sys/memory.h"
 
 #include "uade/sysconfig.h"
@@ -46,11 +47,33 @@ void grow_mem_list( int n )
 	}
 }
 
-void init_mem()
+bool init_mem()
 {
+	printf("%s:%d\n",__FUNCTION__,__LINE__);
+
 	mem_list.allocated = 0;
 	mem_list.used = 0;
 	mem_list.allocted_tab = NULL;
+
+	chipmemory = (uae_u8 *) malloc(512 * 1024);	// 0.5 mb 
+	if (chipmemory == NULL) return false;
+
+	return true;
+}
+
+void cleanup_mem()
+{
+	printf("%s:%d\n",__FUNCTION__,__LINE__);
+
+	if (chipmemory) free(chipmemory);
+	chipmemory = NULL;
+
+	printf("%s:%d\n",__FUNCTION__,__LINE__);
+
+	if (mem_list.allocted_tab) free( mem_list.allocted_tab );
+	mem_list.allocted_tab = NULL;
+
+	printf("%s:%d\n",__FUNCTION__,__LINE__);
 }
 
 int find_free_blocks(int blocks)
@@ -107,7 +130,11 @@ char *_allocChip(uint32_t size)
 			mem_list.allocted_tab[mem_list.used].used = blocks;
 			mem_list.used++;
 
-			for (n=0;n<blocks;n++) used_blocks[start+n] = 1;
+			for (n=0;n<blocks;n++) 
+			{
+				printf("use block %\n",n);
+				used_blocks[start+n] = 1;
+			}
 			return mem_list.allocted_tab[mem_list.used-1].start;
 		}
 
@@ -133,7 +160,11 @@ void _freeChip(void *adr)
 
 			printf("start: %d end: %d\n",startb,endb);
 
-			for (n=startb;n<endb;n++) used_blocks[n] = 0;
+			for (n=startb;n<endb;n++) 
+			{
+				printf("unuse block %d\n",n);
+				used_blocks[n] = 0;
+			}
 
 			mem_list.used--;
 			for (;n<mem_list.used;n++) mem_list.allocted_tab[n] = mem_list.allocted_tab[n+1];

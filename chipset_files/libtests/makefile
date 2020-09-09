@@ -1,5 +1,6 @@
 
-main_SRCS = accuracy.c
+main_SRCS = accuracy.c \
+			chipram.c
 
 files = $(main_SRCS:.c=.exe)  $(SRCS:.c=.o)
 

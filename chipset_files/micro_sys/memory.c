@@ -17,10 +17,16 @@
     USA
  */
 
+
+#define __USE_INLINE__
+
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdbool.h>
+
+#include <proto/exec.h>
+
 #include "micro_sys/memory.h"
 
 #include "uade/sysconfig.h"
@@ -32,17 +38,28 @@ int used_blocks[512];
 
 extern uae_u8 *chipmemory ;
 
+#define AllocVecShared(_size_) AllocVecTags( _size_,  AVT_Type, MEMF_SHARED,  AVT_Alignment,  16, TAG_DONE)
+
+
 void grow_mem_list( int n )
 {
 	struct allocted_mem	*_new_;
 
 	int _new_allocated = mem_list.allocated + n;
-	_new_ = (struct allocted_mem *) malloc( sizeof(struct allocted_mem) * _new_allocated );
+	_new_ = (struct allocted_mem *) AllocVecShared( sizeof(struct allocted_mem) * _new_allocated );
 	
 	if (_new_)
 	{
-		if (mem_list.allocted_tab) free (mem_list.allocted_tab);
+		if (mem_list.allocted_tab)
+		{
+			printf("freed mem_list.allocted_tab %08x\n",mem_list.allocted_tab);
+			FreeVec (mem_list.allocted_tab);
+		}
+
 		mem_list.allocted_tab  = _new_;
+
+		printf("new mem_list.allocted_tab %08x\n",mem_list.allocted_tab);
+
 		mem_list.allocated = _new_allocated;
 	}
 }
@@ -70,8 +87,12 @@ void cleanup_mem()
 
 	printf("%s:%d\n",__FUNCTION__,__LINE__);
 
-	if (mem_list.allocted_tab) free( mem_list.allocted_tab );
-	mem_list.allocted_tab = NULL;
+	if (mem_list.allocted_tab)
+	{
+		printf("mem_list.allocted_tab %08x\n",mem_list.allocted_tab);
+		FreeVec( mem_list.allocted_tab );
+		mem_list.allocted_tab = NULL;
+	}
 
 	printf("%s:%d\n",__FUNCTION__,__LINE__);
 }

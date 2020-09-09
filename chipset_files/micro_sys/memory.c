@@ -22,8 +22,14 @@
 #include <stdio.h>
 #include "micro_sys/memory.h"
 
+#include "uade/sysconfig.h"
+#include "uade/sysdeps.h"
+#include "uade/memory.h"
+
 struct mem_list mem_list;
 int used_blocks[512];
+
+extern uae_u8 *chipmemory ;
 
 void grow_mem_list( int n )
 {
@@ -97,7 +103,7 @@ char *_allocChip(uint32_t size)
 
 		if (start>-1) 
 		{
-			mem_list.allocted_tab[mem_list.used].start = chip_ram + (start << 10);
+			mem_list.allocted_tab[mem_list.used].start = chipmemory + (start << 10);
 			mem_list.allocted_tab[mem_list.used].used = blocks;
 			mem_list.used++;
 
@@ -122,8 +128,8 @@ void _freeChip(void *adr)
 
 		if (mem_list.allocted_tab[n].start == adr  )
 		{
-			int startb = (int) ((char *) adr - chip_ram ) >> 10;
-			int endb = mem_list.allocted_tab[n].used + startb;
+			uint32_t startb = ((uint32_t) adr - (uint32_t) chipmemory ) >> 10;
+			uint32_t endb = mem_list.allocted_tab[n].used + startb;
 
 			printf("start: %d end: %d\n",startb,endb);
 

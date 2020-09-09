@@ -37,8 +37,6 @@ struct _Library
     /* If you need more data fields, add them here */
 };
 
-char *chip_ram = NULL;
-
 struct ExecIFace *IExec UNUSED = NULL;
 
 struct NewlibIFace * INewlib = NULL;
@@ -139,8 +137,12 @@ STATIC APTR libClose(struct LibraryManagerInterface *Self)
 	b = NULL; i = NULL;			
 
 
+extern void cleanup();
+
 void close_libs()
 {
+	cleanup();
+
 	struct ExecIFace *IExec = (struct ExecIFace *)(*(struct ExecBase **)4)->MainInterface;
 	close_lib( DOSBase, IDOS);
 	close_lib( NewLibBase, INewlib);
@@ -196,6 +198,8 @@ BOOL init()
 {
 	if ( ! open_lib( "dos.library", 53L , "main", 1, &DOSBase, (struct Interface **) &IDOS  ) ) return FALSE;
 	if ( ! open_lib( "newlib.library", 53L , "main", 1, &NewLibBase, (struct Interface **) &INewlib  ) ) return FALSE;
+
+	if (setup_mem_banks() == FALSE) return FALSE;
 
 	return TRUE;
 }

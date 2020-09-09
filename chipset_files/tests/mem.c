@@ -23,7 +23,12 @@
 #include <stdio.h>
 #include "../micro_sys/memory.h"
 
-char chip_ram[chip_ram_size];
+#include "../uade/sysconfig.h"
+#include "../uade/sysdeps.h"
+#include "../uade/memory.h"
+
+
+uae_u8 *chipmemory;
 
 void dump_blocks()
 {
@@ -44,9 +49,11 @@ int main()
 
 	init_mem();
 
-	mem1 = allocChip(512);
-	mem2 = allocChip(1024*2-1);
-	mem3 = allocChip(1024*2);
+	chipmemory = malloc(512*1024);
+
+	mem1 = _allocChip(512);
+	mem2 = _allocChip(1024*2-1);
+	mem3 = _allocChip(1024*2);
 
 
 	printf("have mem1 %08x\n",mem1);
@@ -56,13 +63,15 @@ int main()
 dump_blocks();
 
 	printf("free chip\n");
-	freeChip(mem2);
+	_freeChip(mem2);
 
 dump_blocks();
 
-	freeChip(mem1);
+	_freeChip(mem1);
 
 dump_blocks();
+
+	if (chipmemory) free(chipmemory);
 
 	return 0;
 }

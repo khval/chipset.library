@@ -33,8 +33,6 @@ unsigned long int cycles = 0;
 struct ev eventtab[ev_max];
 unsigned long int nextevent =0 ;
 int custom_bank = 0;
-int default_xlate = 0;
-int default_check = 0;
 
 //CIA_hsync_handler();
 //CIA_vsync_handler();
@@ -118,17 +116,16 @@ struct MsgPort			*TimerMP = NULL;
 struct TimeRequest		*TimerIO = NULL;
 int 					timer_device_open = 0;
 
-void setTimerIO()
-{
-	TimerIO->Request.io_Command = TR_ADDREQUEST;
-	TimerIO->Time.Seconds = 0;
-	TimerIO->Time.Microseconds = 1;
-	DoIO(TimerIO);
-}
 
 
 void init_timer_device();
 void close_timer_device();
+
+#define setTimerIO()									\
+	TimerIO->Request.io_Command = TR_ADDREQUEST;		\
+	TimerIO->Time.Seconds=0;							\
+	TimerIO->Time.Microseconds = 2;						\
+	DoIO(TimerIO);
 
 int main()
 {

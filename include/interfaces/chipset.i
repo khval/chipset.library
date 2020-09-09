@@ -24,6 +24,7 @@ STRUCTURE chipsetIFace, InterfaceData_SIZE
 	    FPTR Ichipset_readChipLong
 	    FPTR Ichipset_readChipWord
 	    FPTR Ichipset_readChipByte
+	    FPTR Ichipset_setCIATimingAccuracy
 	LABEL chipsetIFace_SIZE
 
 #endif

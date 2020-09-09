@@ -1,8 +1,12 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdint.h>
 #include <proto/exec.h>
 #include <proto/dos.h>
+
+#define __USE_INLINE__
+#include <proto/chipset.h>
 
 BOOL open_lib( const char *name, int ver , const char *iname, int iver, struct Library **base, struct Interface **interface)
 {
@@ -47,7 +51,15 @@ int main()
 	if (init())
 	{
 		printf("its open, not bad\n");
-		printf("press enter to exit\n");
+		printf("press enter to set CIA Timing Accuracy to 40 us, check CPU usage/load\n");
+		getchar();
+		setCIATimingAccuracy(40);
+		printf("press enter to set CIA Timing Accuracy to 20 us, check CPU usage/load\n");
+		getchar();
+		setCIATimingAccuracy(20);
+		printf("press enter to set CIA Timing Accuracy to 10 us, check CPU usage/load\n");
+		getchar();
+		setCIATimingAccuracy(10);
 		getchar();
 	}
 	close_libs();

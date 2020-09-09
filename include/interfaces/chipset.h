@@ -45,6 +45,7 @@ struct chipsetIFace
 	ULONG APICALL (*readChipLong)(struct chipsetIFace *Self, char * offset);
 	ULONG APICALL (*readChipWord)(struct chipsetIFace *Self, char * offset);
 	ULONG APICALL (*readChipByte)(struct chipsetIFace *Self, char * offset);
+	void APICALL (*setCIATimingAccuracy)(struct chipsetIFace *Self, int us);
 };
 
 #ifdef __cplusplus

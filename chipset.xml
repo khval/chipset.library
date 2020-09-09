@@ -41,6 +41,9 @@
 		<method name="readChipByte" result="ULONG">
 			<arg name="offset" type="char *"/>
 		</method>
+		<method name="setCIATimingAccuracy" result="void">
+			<arg name="us" type="int"/>
+		</method>
 	</interface>
 </library>
 

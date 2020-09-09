@@ -46,6 +46,7 @@ main_SRCS = main/Obtain.c main/Release.c main/allocChip.c main/freeChip.c \
 	main/readChipLong.c  \
 	main/readChipWord.c  \
 	main/readChipByte.c  \
+	main/setCIATimingAccuracy.c \
 	micro_sys/memory.c \
 	uade/cia.c \
 	uade/memory.c \

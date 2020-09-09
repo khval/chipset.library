@@ -17,28 +17,27 @@
     USA
  */
 
-#include <stdlib.h>
-#include <stdint.h>
+
 #include <exec/exec.h>
 #include <proto/exec.h>
 #include <dos/dos.h>
 #include <exec/types.h>
 #include <libraries/chipset.h>
-#include <proto/chipset.h>
 #include <stdarg.h>
 
-/****** chipset/main/readChip ******************************************
+/****** chipset/main/setCIATimingAccuracy ******************************************
 *
 *   NAME
-*      readChip -- Description
+*      setCIATimingAccuracy -- Description
 *
 *   SYNOPSIS
-*      ULONG readChip(ULONG offset);
+*      ULONG setCIATimingAccuracy(int ms, int us);
 *
 *   FUNCTION
 *
 *   INPUTS
-*       offset - 
+*       ms - 
+*       us - 
 *
 *   RESULT
 *       The result ...
@@ -55,11 +54,10 @@
 *
 */
 
-ULONG readChip(char *offset);
+extern _setCIATimingAccuracy( int us);
 
-ULONG _chipset_readChip(struct chipsetIFace *Self,
-       ULONG offset)
+void _chipset_setCIATimingAccuracy(struct chipsetIFace *Self, int us)
 {
-	return readChip(offset);
+	_setCIATimingAccuracy(us);
 }
 

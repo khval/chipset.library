@@ -71,10 +71,15 @@ void do_cia( float delta_us )
 
 extern bool expunge_tasks;
 
+	// 20 ms /  20000 us is a frame, 
+	// if must have a tigger for etch 240 rows then 83 us should be fine.
+
+uint32_t cia_latency_us = 83;
+
 #define setTimerIO()									\
 	TimerIO->Request.io_Command = TR_ADDREQUEST;		\
 	TimerIO->Time.Seconds=0;							\
-	TimerIO->Time.Microseconds = 1;						\
+	TimerIO->Time.Microseconds = cia_latency_us;						\
 	DoIO(TimerIO);
 
 struct MsgPort			*TimerMP = NULL;

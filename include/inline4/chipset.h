@@ -36,5 +36,6 @@
 #define readChipLong(offset) Ichipset->readChipLong((offset)) 
 #define readChipWord(offset) Ichipset->readChipWord((offset)) 
 #define readChipByte(offset) Ichipset->readChipByte((offset)) 
+#define setCIATimingAccuracy(us) Ichipset->setCIATimingAccuracy((us)) 
 
 #endif /* INLINE4_CHIPSET_H */

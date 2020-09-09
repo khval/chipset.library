@@ -1,5 +1,5 @@
 
-main_SRCS = test.c
+main_SRCS = accuracy.c
 
 files = $(main_SRCS:.c=.exe)  $(SRCS:.c=.o)
 

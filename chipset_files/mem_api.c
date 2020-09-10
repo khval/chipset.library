@@ -22,6 +22,8 @@ BOOL setup_mem_banks()
 
 	if (init_mem()==FALSE) return FALSE;
 
+	CIA_reset();
+
 	return TRUE;
 }
 

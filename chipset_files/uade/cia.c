@@ -110,7 +110,7 @@ static void CIA_update(void) // used by cia_handler
 
     /* CIA A timers */
     if ((ciaacra & 0x21) == 0x01) {
-	assert((ciaata+1) >= ciaclocks);
+
 	if ((ciaata+1) == ciaclocks) {
 	    aovfla = 1;
 	    if ((ciaacrb & 0x61) == 0x41) {

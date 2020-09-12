@@ -300,18 +300,18 @@ static uae_u8 ReadCIAA(unsigned int addr)
 	    return (ciaatol >> 8) & 0xff;
 	else
 	    return (ciaatod >> 8) & 0xff;
-     case 10:
+     case 10:	// a
 	ciaatlatch = 1;
 	ciaatol = ciaatod; /* ??? only if not already latched? */
 	return (ciaatol >> 16) & 0xff;
-     case 12:
+     case 12:	// b
 	if (ciaasdr == 1) ciaasdr_unread = 2;
 	return ciaasdr;
-     case 13:
+     case 13:	// c
 	tmp = ciaaicr; ciaaicr = 0; RethinkICRA(); return tmp;
-     case 14:
+     case 14:	// e
 	return ciaacra;
-     case 15:
+     case 15:	// f
 	return ciaacrb;
     }
     return 0;
@@ -475,7 +475,7 @@ void WriteCIAA(uae_u16 addr,uae_u8 val)
 	    ciaatodon = 0;
 	}
 	break;
-     case 10:
+     case 10:	// A
 	if (ciaacrb & 0x80) {
 	    ciaaalarm = (ciaaalarm & ~0xff0000) | (val << 16);
 	} else {
@@ -483,11 +483,11 @@ void WriteCIAA(uae_u16 addr,uae_u8 val)
 	    ciaatodon = 0;
 	}
 	break;
-     case 12:
+     case 12:	// C
 	ciaasdr = val; break;
-     case 13:
+     case 13:	// D
 	setclr(&ciaaimask,val); break; /* ??? call RethinkICR() ? */
-     case 14:
+     case 14:	// E
 	CIA_update();
 	ciaacra = val;
 	if (ciaacra & 0x10) {
@@ -499,7 +499,7 @@ void WriteCIAA(uae_u16 addr,uae_u8 val)
 	}
 	CIA_calctimers();
 	break;
-     case 15:
+     case 15:	// F
 	CIA_update();
 	ciaacrb = val;
 	if (ciaacrb & 0x10) {

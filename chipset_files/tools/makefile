@@ -1,7 +1,8 @@
 
 
 
-main_SRCS = showled.c
+main_SRCS = showled.c \
+			CIAA_map.c
 
 deps = lib.o
 

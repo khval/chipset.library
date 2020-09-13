@@ -2,7 +2,8 @@
 
 
 main_SRCS = showled.c \
-			CIAA_map.c
+			CIAA_map.c \
+			quit.c
 
 deps = lib.o
 

@@ -103,11 +103,16 @@ TIME    equ     2148
 	printf("Led at %08x\n",&(_ciaa ->ciacra));
 
 
-        for (;;)        // busy wait
-        {
+	// we need to close this program safe, and the library safe
+	writeChipByte(0x00000000,0x00);	// first 1024 bytes in chip ram, can be used for something, address 0 is normally allocation failed anyway.
+
+	for (;;)        // busy wait
+	{
                 if (1&readChipByte(&(_ciaa ->ciaicr))) continue;                        // Wait for timer expired flag
                 writeChipByte(&(_ciaa ->ciacra),CIAB_LED ^ readChipByte(&(_ciaa ->ciacra)));     // blink light
                 writeChipByte(&(_ciaa ->ciacra),1|readChipByte(&(_ciaa ->ciacra)));             // Restart timer
+
+		if (readChipByte(0x00000000) == 0xFF) break;
         }
 
 /*

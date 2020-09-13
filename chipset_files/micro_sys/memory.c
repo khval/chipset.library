@@ -72,7 +72,7 @@ bool init_mem()
 	mem_list.used = 0;
 	mem_list.allocted_tab = NULL;
 
-	chipmemory = (uae_u8 *) malloc(512 * 1024);	// 0.5 mb 
+	chipmemory = (uae_u8 *) AllocVecShared(512 * 1024);	// 0.5 mb 
 	if (chipmemory == NULL) return false;
 
 	return true;
@@ -82,7 +82,7 @@ void cleanup_mem()
 {
 	printf("%s:%d\n",__FUNCTION__,__LINE__);
 
-	if (chipmemory) free(chipmemory);
+	if (chipmemory) FreeVec(chipmemory);
 	chipmemory = NULL;
 
 	printf("%s:%d\n",__FUNCTION__,__LINE__);

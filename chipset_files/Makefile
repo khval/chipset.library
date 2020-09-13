@@ -53,7 +53,8 @@ main_SRCS = main/Obtain.c main/Release.c main/allocChip.c main/freeChip.c \
 	cia_process.c \
 	timer_device.c \
 	spawn.c \
-	mem_api.c
+	mem_api.c \
+	68k_stubs.c
 
 # -------------------------------------------------------------
 # Nothing should need changing below this line

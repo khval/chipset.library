@@ -294,7 +294,8 @@ STATIC CONST struct TagItem lib_managerTags[] =
 #include "chipset_vectors.c"
 
 /* Uncomment this line (and see below) if your library has a 68k jump table */
-/* extern APTR VecTable68K[]; */
+
+extern APTR VecTable68K[]; 
 
 STATIC CONST struct TagItem main_v1_Tags[] =
 {
@@ -317,7 +318,7 @@ STATIC CONST struct TagItem libCreateTags[] =
 	{ CLT_InitFunc,		(Tag)libInit			},
 	{ CLT_Interfaces,	(Tag)libInterfaces		},
 	/* Uncomment the following line if you have a 68k jump table */
-	/* { CLT_Vector68K, (Tag)VecTable68K }, */
+	{ CLT_Vector68K, (Tag)VecTable68K },
 	{TAG_DONE,		 0 }
 };
 

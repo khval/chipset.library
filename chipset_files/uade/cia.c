@@ -370,7 +370,7 @@ void WriteCIAA(uae_u16 addr,uae_u8 val)
 {
     int oldled, oldovl;
     switch(addr & 0xf) {
-     case 0:
+     case 0:					// pra
 	oldovl = ciaapra & 1;
 	oldled = ciaapra & 2;
 	ciaapra = (ciaapra & ~0x3) | (val & 0x3); 
@@ -387,7 +387,7 @@ void WriteCIAA(uae_u16 addr,uae_u8 val)
 	}
 	*/
 	break;
-     case 1:
+     case 1:					// prb
 	ciaaprb = val;
 	if (prtopen==1) {
 #ifndef __DOS__
@@ -423,16 +423,16 @@ void WriteCIAA(uae_u16 addr,uae_u8 val)
 	}
 	ciaaicr |= 0x10;
 	break;
-     case 2:
+     case 2:					// ddra
 	ciaadra = val; break;
-     case 3:
+     case 3:					// ddrb
 	ciaadrb = val; break;
-     case 4:
+     case 4:					// talo
 	CIA_update();
 	ciaala = (ciaala & 0xff00) | val;
 	CIA_calctimers();
 	break;
-     case 5:
+     case 5:					// tahi
 	CIA_update();
 	ciaala = (ciaala & 0xff) | (val << 8);
 	if ((ciaacra & 1) == 0)
@@ -443,12 +443,12 @@ void WriteCIAA(uae_u16 addr,uae_u8 val)
 	}
 	CIA_calctimers();
 	break;
-     case 6:
+     case 6:					// tblo
 	CIA_update();
 	ciaalb = (ciaalb & 0xff00) | val;
 	CIA_calctimers();
 	break;
-     case 7:
+     case 7:					// tbhi
 	CIA_update();
 	ciaalb = (ciaalb & 0xff) | (val << 8);
 	if ((ciaacrb & 1) == 0)
@@ -459,7 +459,7 @@ void WriteCIAA(uae_u16 addr,uae_u8 val)
 	}
 	CIA_calctimers();
 	break;
-     case 8:
+     case 8:					// todlo
 	if (ciaacrb & 0x80) {
 	    ciaaalarm = (ciaaalarm & ~0xff) | val;
 	} else {
@@ -467,7 +467,7 @@ void WriteCIAA(uae_u16 addr,uae_u8 val)
 	    ciaatodon = 1;
 	}
 	break;
-     case 9:
+     case 9:					// todmid
 	if (ciaacrb & 0x80) {
 	    ciaaalarm = (ciaaalarm & ~0xff00) | (val << 8);
 	} else {
@@ -475,7 +475,7 @@ void WriteCIAA(uae_u16 addr,uae_u8 val)
 	    ciaatodon = 0;
 	}
 	break;
-     case 10:	// A
+     case 10:				// todhi
 	if (ciaacrb & 0x80) {
 	    ciaaalarm = (ciaaalarm & ~0xff0000) | (val << 16);
 	} else {
@@ -483,11 +483,11 @@ void WriteCIAA(uae_u16 addr,uae_u8 val)
 	    ciaatodon = 0;
 	}
 	break;
-     case 12:	// C
+     case 12:				// sdr
 	ciaasdr = val; break;
-     case 13:	// D
+     case 13:				// icr
 	setclr(&ciaaimask,val); break; /* ??? call RethinkICR() ? */
-     case 14:	// E
+     case 14:				// cra
 	CIA_update();
 	ciaacra = val;
 	if (ciaacra & 0x10) {
@@ -499,7 +499,7 @@ void WriteCIAA(uae_u16 addr,uae_u8 val)
 	}
 	CIA_calctimers();
 	break;
-     case 15:	// F
+     case 15:				// crb
 	CIA_update();
 	ciaacrb = val;
 	if (ciaacrb & 0x10) {
@@ -515,21 +515,21 @@ void WriteCIAB(uae_u16 addr,uae_u8 val)
 {
     int oldval;
     switch(addr & 0xf) {
-     case 0:
+     case 0:					// pra
         ciabpra  = val;
 	break;
-     case 1:
+     case 1:					// prb
 	ciabprb = val; break;
-     case 2:
+     case 2:					// ddra
 	ciabdra = val; break;
-     case 3:
+     case 3:					// ddrb
 	ciabdrb = val; break;
-     case 4:
+     case 4:					// talo
 	CIA_update();
 	ciabla = (ciabla & 0xff00) | val;
 	CIA_calctimers();
 	break;
-     case 5:
+     case 5:					// tahi
 	CIA_update();
 	ciabla = (ciabla & 0xff) | (val << 8);
 	if ((ciabcra & 1) == 0)
@@ -540,12 +540,12 @@ void WriteCIAB(uae_u16 addr,uae_u8 val)
 	}
 	CIA_calctimers();
 	break;
-     case 6:
+     case 6:					//  tblo
 	CIA_update();
 	ciablb = (ciablb & 0xff00) | val;
 	CIA_calctimers();
 	break;
-     case 7:
+     case 7:					// tbhi
 	CIA_update();
 	ciablb = (ciablb & 0xff) | (val << 8);
 	if ((ciabcrb & 1) == 0)
@@ -556,7 +556,7 @@ void WriteCIAB(uae_u16 addr,uae_u8 val)
 	}
 	CIA_calctimers();
 	break;
-     case 8:
+     case 8:					// todlo
 	if (ciabcrb & 0x80) {
 	    ciabalarm = (ciabalarm & ~0xff) | val;
 	} else {
@@ -564,7 +564,7 @@ void WriteCIAB(uae_u16 addr,uae_u8 val)
 	    ciabtodon = 1;
 	}
 	break;
-     case 9:
+     case 9:					// todmid
 	if (ciabcrb & 0x80) {
 	    ciabalarm = (ciabalarm & ~0xff00) | (val << 8);
 	} else {
@@ -572,7 +572,7 @@ void WriteCIAB(uae_u16 addr,uae_u8 val)
 	    ciabtodon = 0;
 	}
 	break;
-     case 10:
+     case 10:				// todhi
 	if (ciabcrb & 0x80) {
 	    ciabalarm = (ciabalarm & ~0xff0000) | (val << 16);
 	} else {
@@ -580,13 +580,13 @@ void WriteCIAB(uae_u16 addr,uae_u8 val)
 	    ciabtodon = 0;
 	}
 	break;
-     case 12:
+     case 12:				// sdr
 	ciabsdr = val;
 	break;
-     case 13:
+     case 13:				// lcr
 	setclr(&ciabimask,val);
 	break;
-     case 14:
+     case 14:				// cra
 	CIA_update();
 	ciabcra = val;
 	if (ciabcra & 0x10) {
@@ -595,7 +595,7 @@ void WriteCIAB(uae_u16 addr,uae_u8 val)
 	}
 	CIA_calctimers();
 	break;
-     case 15:
+     case 15:				// crb
 	CIA_update();
 	ciabcrb = val;
 	if (ciabcrb & 0x10) {

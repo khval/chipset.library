@@ -13,11 +13,29 @@ by so doing transform code that was written as hardware banging code into more s
 AGA / OCS is not that useful to emulate, blitter and copper and so can be replaced by other code, 
 pretty easy, at least if your working with a open source 680x0 program.
 
-GPL2 was choices because UAE uses GPL2, but its possible this might change, depending on dependency’s, what emulation its going to be based on.
-
 Do not expect chipset.libary to work under forbid() / permit() locks.
 Multitasking is needed for correct as possible values; however, it is designed to compensate for any 
 time lags caused by interruptions in the task scheduler.
+
+# Dependencies
+
+The 680x0 assembler tests used VBCC, found a GITHUB repo that includes a SDK for OS3.x that works with VBCC. 
+(Tried to use NDK31 but had some issue, did not find the LVO values.)
+
+https://github.com/deplinenoise/amiga-sdk
+
+To compileon C/C++ code you need the AmigaOS4.1 SDK.
+
+https://wiki.amigaos.net/wiki/Programming_AmigaOS_4:_The_Development_Environment
+
+# Compiling 
+
+To compile the 680x0 lib tests, you need to make a assign in s:user-startup like
+
+Assign SDK31: <your path to the files>
+Read the AmigaDOS or the Tripos manual for howto use assign, if you don’t know how to use it.
+  
+When you have correctly setup the assign, you should be able to type make.
 
 # Disclaimer:
 

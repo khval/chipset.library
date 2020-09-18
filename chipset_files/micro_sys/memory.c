@@ -66,7 +66,7 @@ void grow_mem_list( int n )
 
 bool init_mem()
 {
-	printf("%s:%d\n",__FUNCTION__,__LINE__);
+	printf("%s:%s:%d\n",__FILE__,__FUNCTION__,__LINE__);
 
 	mem_list.allocated = 0;
 	mem_list.used = 0;

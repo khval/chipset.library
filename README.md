@@ -19,7 +19,7 @@ time lags caused by interruptions in the task scheduler.
 
 # Dependencies
 
-The 680x0 assembler tests used VBCC, found a GITHUB repo that includes a SDK for OS3.x that works with VBCC. 
+The 680x0 assembler tests use VBCC, found a GITHUB repo that includes a SDK for OS3.x that works with VBCC. 
 (Tried to use NDK31 but had some issue, did not find the LVO values.)
 
 https://github.com/deplinenoise/amiga-sdk

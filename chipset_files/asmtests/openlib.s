@@ -1,6 +1,6 @@
 
-oldOpenLibrary EQU -$0198
-closeLibrary EQU -$019E
+	include "lvo/exec_lib.i"
+	include "lvo/dos_lib.i"
 
 
 	SECTION main,CODE
@@ -8,49 +8,68 @@ closeLibrary EQU -$019E
 openLib	macro 
 	lea \1,A1
 	move.l 4.w,a6
-	jsr oldOpenLibrary(a6)
-	beq.s	.out
-	move.l \2,A0
-	move.l D0,(A0)
+	moveq #0,d0
+	jsr _LVOOpenLibrary(a6)
+	move.l d0,\2
+	tst.l	d0
+	beq	closeLibs
 	endm
 
 closeLib	macro
-		lea 1\,A1
+		lea 1\(pc),a1
 		jsr _closeLib
 		endm
 
 writeText	macro
-		lea 1\,A1
+		lea 1\(pc),a1
 		jsr _writeText
 		endm
 
 main:
 	openLib	dosName, dosBase
-;	openLib	chipsetName, chipsetBase
+	openLib	chipsetName, chipsetBase
 
-;	writeText	txtLibsOpen
+	lea	txtLibsOpen(pc),a1
+	jsr	_writeText
 
-.out:
-;	closeLib	chipsetBase
-	closeLib	dosBase
+	move.l #30,d1
+	jsr delay
+
+closeLibs:
+	move.l dosBase(pc),a1
+	jsr	closeLib
+	move.l chipsetBase(pc),a1
+	jsr	closeLib
 	rts
 
-_closeLib:
+closeLib
 	move.l a1,d0
-	tst.l	d0			; if D0==NULL
-	beq	.notOpen
-	move.l 4.w,a6
-	jsr	closeLibrary(a6)
-.notOpen:
+	tst.l d0
+	beq.s	.notOpen
+	move.l 4,a6
+	jsr	_LVOCloseLibrary(a6)
+	moveq #0,d0
+.notOpen
+	rts
+
+delay
+	move.l dosBase(pc),a6
+	jsr _LVODelay(a6)
 	rts
 
 _writeText:
 	move.l (a1),d2
 	add.l #4,a1
 	move.l a1,d1
-	lea dosBase,A6
-	jsr -$03AE(a6)
+	move.l	dosBase(pc),A6
+	jsr		_LVOWriteChars(a6)
 	rts
+
+dosBase:
+	dc.l	0
+
+chipsetBase
+	dc.l 0
 
 txtLibsOpen:
 	dc.l	14
@@ -59,11 +78,7 @@ txtLibsOpen:
 dosName:
 	dc.b	"dos.library",0
 
-dosBase:
-	dc.l	0
-
 chipsetName:
 	dc.b	"chipset.library",0
 
-chipsetBase
-	dc.l 0
+

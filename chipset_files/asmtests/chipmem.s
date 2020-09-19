@@ -37,16 +37,16 @@ main:
 
 	move.l #2000,D1
 	LINKLIB _LVOAllocChip,chipsetBase
-	move D0,allocated
+	move.l D0,allocated
 
 	move.l #60,d1
-	jsr delay
+	LINKLIB _LVODelay,dosBase
 
 	move.l allocated,A0
 	LINKLIB _LVOFreeChip,chipsetBase
 
 	move.l #60,d1
-	jsr delay
+	LINKLIB _LVODelay,dosBase
 
 closeLibs:
 	move.l dosBase(pc),a1
@@ -65,11 +65,6 @@ closeLib
 .notOpen
 	rts
 
-delay
-	move.l dosBase(pc),a6
-	jsr _LVODelay(a6)
-	rts
-
 _writeText:
 	move.l (a1),d2
 	add.l #4,a1
@@ -82,10 +77,10 @@ dosBase:
 	dc.l	0
 
 chipsetBase
-	dc.l 0
+	dc.l	0
 
 allocated:
-	dc.l 0
+	dc.l	0
 
 txtLibsOpen:
 	dc.l	14

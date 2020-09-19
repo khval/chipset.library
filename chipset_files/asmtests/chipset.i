@@ -31,59 +31,60 @@
 
 _LVOAllocChip	EQU -30
 
-; Allocates chip memory in virtual space
+	; Allocates chip memory in virtaual space
 
-; D1 size to allocate
-; D0 returns address,
+	; D1 size to allocate
+	; D0 returns address (host space address), you need to convert if you need it as virtual space.
 
 _LVOFreeChip	EQU -36
 
-; Free chip memory in virtaual space
+	; Free chip memory in virtaual space
 
-; A0 address to free
+	; A0 address to free (host space address)
 
 _LVOHostAddressToChip	EQU -42
 
-; D0 returns CHIP address (virtual address)
+	; D0 returns CHIP address (virtual address)
 
 _LVOChipAddressToHost	EQU -42
 
-; D0 returns native address
+	; D0 returns native address
 
 _LVOWriteChipLong	EQU -48
 
-; A0 address in chip (virtual mem)
-; D1 value to set
+	; A0 address in chip (virtual mem)
+	; D1 value to set
 
 _LVOWriteChipWord	EQU -54
 
-; A0 address in chip (virtual mem)
-; D1 value to set
+	; A0 address in chip (virtual mem)
+	; D1 value to set
 
 _LVOWriteChipByte	EQU -60
 
-; A0 address in chip (virtual mem)
-; D1 value to set
+	; A0 address in chip (virtual mem)
+	; D1 value to set
 
 _LVOReadChipLong	EQU -66
 
-; A0 address in chip (virtual mem)
-; D0 return value
+	; A0 address in chip (virtual mem)
+	; D0 return value
 
 _LVOReadChipWord	EQU -72
 
-; A0 address in chip (virtual mem)
-; D0 return value
+	; A0 address in chip (virtual mem)
+	; D0 return value
 
 _LVOReadChipByte	EQU -78
 
-; A0 address in chip (virtual mem)
-; D0 return value
+	; A0 address in chip (virtual mem)
+	; D0 return value
 
 _LVOSetCIATimingAccuracy	EQU -84
 
-; Because its not ideal to use 100% cpu time to emulate one chip
-; this timer sets how often the chip should wake up, and take care of timing.
+	; Because its not ideal to use 100% cpu time to emulate one chip
+	; this timer sets how often the chip should wake up, and take care of timing (and count CPU cycles)
+	; On real hardware you don't need to worry about this.
 
-; D1 sets mciro seconds accuracy, 
+	; D1 sets mciro seconds accuracy, 
 

@@ -81,6 +81,10 @@ uade/memory.o:		uade/memory.c
 mem_api.o:		mem_api.c 
 	gcc  -Wall -O3  $(INC) $(OPT) -c  -D__USE_INLINE__ -D__no_stdlib__ $(@:.o=.c) -o $@
 
+68k_stubs.o:	68k_stubs.c
+	gcc  -Wall -O3  $(INC)  -c -o 68k_stubs.o 68k_stubs.c
+
+
 .PHONY: clean
 clean:
 	$(RM) $(TARGET) $(OBJS)

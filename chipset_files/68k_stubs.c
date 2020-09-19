@@ -2,8 +2,21 @@
 #include <exec/libraries.h>
 #include <exec/emulation.h>
 
+#include "uade/sysconfig.h"
+#include "uade/sysdeps.h"
+#include "uade/memory.h"
+
+#define __USE_INLINE__
+
+#include <stdio.h>
 #include <proto/exec.h>
 #include <proto/dos.h>
+
+#undef Close
+#undef Open
+
+#define call_mem_get_func(func,addr) ((*func)(addr))
+#define call_mem_put_func(func,addr,v) ((*func)(addr,v))
 
 
 STATIC APTR stub_Open_ppc(ULONG *regarray);
@@ -11,14 +24,14 @@ STATIC APTR stub_Close_ppc(ULONG *regarray);
 STATIC APTR stub_Expunge_ppc(ULONG *regarray);
 STATIC ULONG stub_Reserved_ppc(ULONG *regarray);
 
-STATIC VOID stub_allocChip_ppc(ULONG *regarray);
+STATIC ULONG stub_allocChip_ppc(ULONG *regarray);
 STATIC VOID stub_freeChip_ppc(ULONG *regarray);
 STATIC VOID stub_writeChipLong_ppc(ULONG *regarray);
 STATIC VOID stub_writeChipWord_ppc(ULONG *regarray);
 STATIC VOID stub_writeChipByte_ppc(ULONG *regarray);
-STATIC VOID stub_readChipLong_ppc(ULONG *regarray);
-STATIC VOID stub_readChipWord_ppc(ULONG *regarray);
-STATIC VOID stub_readChipByte_ppc(ULONG *regarray);
+STATIC ULONG stub_readChipLong_ppc(ULONG *regarray);
+STATIC ULONG stub_readChipWord_ppc(ULONG *regarray);
+STATIC ULONG stub_readChipByte_ppc(ULONG *regarray);
 STATIC VOID stub_setCIATimingAccuracy_ppc(ULONG *regarray);
 
 
@@ -79,46 +92,77 @@ STATIC APTR stub_Close_ppc(ULONG *regarray)
 
 STATIC APTR stub_Expunge_ppc(ULONG *regarray)
 {
+	Printf("%s:%s:%ld\n",__FILE__,__FUNCTION__,__LINE__);
+
 	return NULL;
 }
 
 STATIC ULONG stub_Reserved_ppc(ULONG *regarray)
 {
+	Printf("%s:%s:%ld\n",__FILE__,__FUNCTION__,__LINE__);
+
 	return 0UL;
 }
 
-STATIC VOID stub_allocChip_ppc(ULONG *regarray)
+STATIC ULONG stub_allocChip_ppc(ULONG *regarray)
 {
+	Printf("%s:%s:%ld\n",__FILE__,__FUNCTION__,__LINE__);
+
+	regarray[REG68K_D0/4] = _allocChip(regarray[REG68K_D1/4]);;
+
+	return (APTR) regarray[REG68K_D0/4];
 }
 
 STATIC VOID stub_freeChip_ppc(ULONG *regarray)
 {
+	Printf("%s:%s:%ld\n",__FILE__,__FUNCTION__,__LINE__);
+
+	_freeChip(regarray[REG68K_A0/4]);;
 }
 
 STATIC VOID stub_writeChipLong_ppc(ULONG *regarray)
 {
+	Printf("%s:%s:%ld\n",__FILE__,__FUNCTION__,__LINE__);
+	longput((char *) regarray[REG68K_A0/4],(ULONG) regarray[REG68K_D1/4]);
 }
 
 STATIC VOID stub_writeChipWord_ppc(ULONG *regarray)
 {
+	Printf("%s:%s:%ld\n",__FILE__,__FUNCTION__,__LINE__);
+	wordput(regarray[REG68K_A0/4], regarray[REG68K_D1/4]);
 }
 
 STATIC VOID stub_writeChipByte_ppc(ULONG *regarray)
 {
+	Printf("%s:%s:%ld\n",__FILE__,__FUNCTION__,__LINE__);
+	byteput(regarray[REG68K_A0/4], regarray[REG68K_D1/4]);
 }
 
-STATIC VOID stub_readChipLong_ppc(ULONG *regarray)
+STATIC ULONG stub_readChipLong_ppc(ULONG *regarray)
 {
+	Printf("%s:%s:%ld\n",__FILE__,__FUNCTION__,__LINE__);
+
+	regarray[REG68K_D0/4]=longget(regarray[REG68K_A0/4]);
+	return (APTR) regarray[REG68K_D0/4];
 }
 
-STATIC VOID stub_readChipWord_ppc(ULONG *regarray)
+STATIC ULONG stub_readChipWord_ppc(ULONG *regarray)
 {
+	Printf("%s:%s:%ld\n",__FILE__,__FUNCTION__,__LINE__);
+
+	regarray[REG68K_D0/4]=wordget(regarray[REG68K_A0/4]);
+	return (APTR) regarray[REG68K_D0/4];
 }
 
-STATIC VOID stub_readChipByte_ppc(ULONG *regarray)
+STATIC ULONG stub_readChipByte_ppc(ULONG *regarray)
 {
+	Printf("%s:%s:%ld\n",__FILE__,__FUNCTION__,__LINE__);
+
+	regarray[REG68K_D0/4]=byteget(regarray[REG68K_A0/4]);
+	return (APTR) regarray[REG68K_D0/4];
 }
 
 STATIC VOID stub_setCIATimingAccuracy_ppc(ULONG *regarray)
 {
+	Printf("%s:%s:%ld\n",__FILE__,__FUNCTION__,__LINE__);
 }

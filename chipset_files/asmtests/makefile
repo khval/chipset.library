@@ -13,7 +13,8 @@ include makefile.cfg
 
 inc=-Isdk31: -Isdk31:includes/include_i
 
-tests = openlib.exe	
+tests = openlib.exe	\
+	chipmem.exe
 
 all:	${tests} 
 
@@ -25,6 +26,10 @@ clean:
 openlib.exe: openlib.s
 		$(compiler) $(options) $(inc) -Fhunk -o obj/openlib.o openlib.s 
 		$(link) -bamigahunk -o openlib.exe -s  obj/openlib.o
+
+chipmem.exe: chipmem.s
+		$(compiler) $(options) $(inc) -Fhunk -o obj/chipmem.o chipmem.s 
+		$(link) -bamigahunk -o chipmem.exe -s  obj/chipmem.o
 
 .PRECIOUS: %.hunk 
 

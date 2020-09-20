@@ -17,6 +17,9 @@
 #include "custom.h"
 #include "cia.h"
 
+#include "proto/exec.h"
+#include "proto/dos.h"
+
 // #include "uade.h"
 
 #define DIV10 5 /* Yes, a bad identifier. */
@@ -260,12 +263,63 @@ void CIA_vsync_handler(void)
     }
 }
 
+ULONG _spyCIAA(unsigned int addr)
+{
+    unsigned int tmp;
+
+	addr = addr >> 8;
+
+    switch(addr & 0xf) {
+     case 0:				// pra
+	tmp = 0;
+	return tmp;
+     case 1:				// prb
+	return ciaaprb;
+     case 2:				// ddra
+	return ciaadra;
+     case 3:				// ddrb
+	return ciaadrb;
+     case 4:				// talo
+	return ciaata & 0xff;
+     case 5:				// tahi
+	return ciaata >> 8;
+     case 6:				// tblo
+	return ciaatb & 0xff;
+     case 7:				// tbhi
+	return ciaatb >> 8;
+     case 8:				// todlo
+	if (ciaatlatch) {
+	    return ciaatol & 0xff;
+	} else
+	    return ciaatod & 0xff;
+     case 9:				// todmid
+	if (ciaatlatch)
+	    return (ciaatol >> 8) & 0xff;
+	else
+	    return (ciaatod >> 8) & 0xff;
+     case 10:			// todhi
+	return (ciaatod >> 16) & 0xff;
+     case 12:			// sdr
+	return ciaasdr;
+     case 13:			// icr
+	return ciaaicr;
+     case 14:			// cra
+	return ciaacra;
+     case 15:			// crb
+	return ciaacrb;
+    }
+    return 0;
+}
+
+
 static uae_u8 ReadCIAA(unsigned int addr)
 {
     unsigned int tmp;
 
+	Printf("ReadCIAA( %08lx)\n", addr);
+
     switch(addr & 0xf) {
-     case 0:
+     case 0:				// pra
 	tmp = 0;
 #if 0
 	if ((JSEM_ISMOUSE (0, &currprefs))
@@ -275,44 +329,91 @@ static uae_u8 ReadCIAA(unsigned int addr)
 	    tmp |= 0x80;
 #endif
 	return tmp;
-     case 1:
+     case 1:				// prb
 	return ciaaprb;
-     case 2:
+     case 2:				// ddra
 	return ciaadra;
-     case 3:
+     case 3:				// ddrb
 	return ciaadrb;
-     case 4:
+     case 4:				// talo
 	return ciaata & 0xff;
-     case 5:
+     case 5:				// tahi
 	return ciaata >> 8;
-     case 6:
+     case 6:				// tblo
 	return ciaatb & 0xff;
-     case 7:
+     case 7:				// tbhi
 	return ciaatb >> 8;
-     case 8:
+     case 8:				// todlo
 	if (ciaatlatch) {
 	    ciaatlatch = 0;
 	    return ciaatol & 0xff;
 	} else
 	    return ciaatod & 0xff;
-     case 9:
+     case 9:				// todmid
 	if (ciaatlatch)
 	    return (ciaatol >> 8) & 0xff;
 	else
 	    return (ciaatod >> 8) & 0xff;
-     case 10:	// a
+     case 10:			// todhi
 	ciaatlatch = 1;
 	ciaatol = ciaatod; /* ??? only if not already latched? */
 	return (ciaatol >> 16) & 0xff;
-     case 12:	// b
+     case 12:			// sdr
 	if (ciaasdr == 1) ciaasdr_unread = 2;
 	return ciaasdr;
-     case 13:	// c
+     case 13:			// icr
 	tmp = ciaaicr; ciaaicr = 0; RethinkICRA(); return tmp;
-     case 14:	// e
+     case 14:			// cra
 	return ciaacra;
-     case 15:	// f
+     case 15:			// crb
 	return ciaacrb;
+    }
+    return 0;
+}
+
+ULONG _spyCIAB(unsigned int addr)
+{
+    unsigned int tmp;
+
+	addr = addr >> 8;
+
+    switch(addr & 0xf) {
+     case 0:
+	return ciabpra;
+     case 1:
+	return ciabprb;
+     case 2:
+	return ciabdra;
+     case 3:
+	return ciabdrb;
+     case 4:
+	return ciabta & 0xff;
+     case 5:
+	return ciabta >> 8;
+     case 6:
+	return ciabtb & 0xff;
+     case 7:
+	return ciabtb >> 8;
+     case 8:
+	if (ciabtlatch) {
+	    return ciabtol & 0xff;
+	} else
+	    return ciabtod & 0xff;
+     case 9:
+	if (ciabtlatch)
+	    return (ciabtol >> 8) & 0xff;
+	else
+	    return (ciabtod >> 8) & 0xff;
+     case 10:
+	return (ciabtod >> 16) & 0xff;
+     case 12:
+	return ciabsdr;
+     case 13:
+	return ciabicr;
+     case 14:
+	return ciabcra;
+     case 15:
+	return ciabcrb;
     }
     return 0;
 }

@@ -46,5 +46,7 @@
 #define bitClrChipWord(offset, bit) Ichipset->bitClrChipWord((offset), (bit)) 
 #define bitClrChipByte(offset, bit) Ichipset->bitClrChipByte((offset), (bit)) 
 #define setCIATimingAccuracy(us) Ichipset->setCIATimingAccuracy((us)) 
+#define spyCIAA(Addr) Ichipset->spyCIAA((Addr)) 
+#define spyCIAB(Addr) Ichipset->spyCIAB((Addr)) 
 
 #endif /* INLINE4_CHIPSET_H */

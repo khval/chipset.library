@@ -84,6 +84,15 @@
 		<method name="setCIATimingAccuracy" result="void">
 			<arg name="us" type="int"/>
 		</method>
+
+		<method name="spyCIAA" result="ULONG">
+			<arg name="Addr" type="ULONG"/>
+		</method>
+
+		<method name="spyCIAB" result="ULONG">
+			<arg name="Addr" type="ULONG"/>
+		</method>
+
 	</interface>
 </library>
 

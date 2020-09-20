@@ -29,6 +29,8 @@ STATIC CONST APTR main_v1_vectors[] =
     _chipset_bitClrChipWord,
     _chipset_bitClrChipByte,
     _chipset_setCIATimingAccuracy,
+    _chipset_spyCIAA,
+    _chipset_spyCIAB,
     (APTR)-1
 };
 

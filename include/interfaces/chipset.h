@@ -55,6 +55,8 @@ struct chipsetIFace
 	void APICALL (*bitClrChipWord)(struct chipsetIFace *Self, char * offset, ULONG bit);
 	void APICALL (*bitClrChipByte)(struct chipsetIFace *Self, char * offset, ULONG bit);
 	void APICALL (*setCIATimingAccuracy)(struct chipsetIFace *Self, int us);
+	ULONG APICALL (*spyCIAA)(struct chipsetIFace *Self, ULONG Addr);
+	ULONG APICALL (*spyCIAB)(struct chipsetIFace *Self, ULONG Addr);
 };
 
 #ifdef __cplusplus

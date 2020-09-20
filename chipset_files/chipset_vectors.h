@@ -27,4 +27,13 @@ extern void                 VARARGS68K _chipset_writeChipByte(struct chipsetIFac
 extern ULONG                VARARGS68K _chipset_readChipLong(struct chipsetIFace *, char * offset);
 extern ULONG                VARARGS68K _chipset_readChipWord(struct chipsetIFace *, char * offset);
 extern ULONG                VARARGS68K _chipset_readChipByte(struct chipsetIFace *, char * offset);
+extern void                 VARARGS68K _chipset_bitChgChipLong(struct chipsetIFace *, char * offset, ULONG value);
+extern void                 VARARGS68K _chipset_bitChgChipWord(struct chipsetIFace *, char * offset, ULONG bit);
+extern void                 VARARGS68K _chipset_bitChgChipByte(struct chipsetIFace *, char * offset, ULONG bit);
+extern void                 VARARGS68K _chipset_bitSetChipLong(struct chipsetIFace *, char * offset, ULONG bit);
+extern void                 VARARGS68K _chipset_bitSetChipWord(struct chipsetIFace *, char * offset, ULONG bit);
+extern void                 VARARGS68K _chipset_bitSetChipByte(struct chipsetIFace *, char * offset, ULONG bit);
+extern void                 VARARGS68K _chipset_bitClrChipLong(struct chipsetIFace *, char * offset, ULONG bit);
+extern void                 VARARGS68K _chipset_bitClrChipWord(struct chipsetIFace *, char * offset, ULONG bit);
+extern void                 VARARGS68K _chipset_bitClrChipByte(struct chipsetIFace *, char * offset, ULONG bit);
 extern void                 VARARGS68K _chipset_setCIATimingAccuracy(struct chipsetIFace *, int us);

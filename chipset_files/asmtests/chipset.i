@@ -29,6 +29,7 @@
 ; Host address is in the computers main memory.
 ;
 
+
 _LVOAllocChip	EQU -30
 
 	; Allocates chip memory in virtaual space
@@ -80,7 +81,52 @@ _LVOReadChipByte	EQU -84
 	; A0 address in chip (virtual mem)
 	; D0 return value
 
-_LVOSetCIATimingAccuracy	EQU -90
+_LVOBitChgChipLong	EQU -90
+
+	; A0 address in chip (virtual mem)
+	; D1 bit to flip
+
+_LVOBitChgChipWord	EQU -96
+
+	; A0 address in chip (virtual mem)
+	; D1 bit to flip
+
+_LVOBitChgChipByte		EQU -102
+
+	; A0 address in chip (virtual mem)
+	; D1 bit to flip
+
+_LVOBitSetChipLong		EQU -108
+
+	; A0 address in chip (virtual mem)
+	; D1 bit to set
+
+_LVOBitSetChipWord		EQU -114
+
+	; A0 address in chip (virtual mem)
+	; D1 bit to set
+
+_LVOBitSetChipByte		EQU -120
+
+	; A0 address in chip (virtual mem)
+	; D1 bit to set
+
+_LVOBitClrChipLong		EQU -126
+
+	; A0 address in chip (virtual mem)
+	; D1 bit to clear
+
+_LVOBitClrChipWord		EQU -132
+
+	; A0 address in chip (virtual mem)
+	; D1 bit to clear
+
+_LVOBitClrChipByte		EQU -138
+
+	; A0 address in chip (virtual mem)
+	; D1 bit to clear
+
+_LVOSetCIATimingAccuracy	EQU -144
 
 	; Because its not ideal to use 100% cpu time to emulate one chip
 	; this timer sets how often the chip should wake up, and take care of timing (and count CPU cycles)
@@ -91,8 +137,8 @@ _LVOSetCIATimingAccuracy	EQU -90
 ; chipReadByte sourceOffset,sourceReg,DestReg
 
 chipReadByte		macro 
-	move.l	\2,d1
-	add.l		#\1,d1
+	move.l	\2,A0
+	add.l		#\1,A0
 	LINKLIB	_LVOReadChipByte,chipsetBase
 	move.l	d0,\3
 	endm
@@ -102,8 +148,8 @@ chipReadByte		macro
 
 chipWriteByte		macro 
 	move.l	\1,d1
-	move.l	\3,d2
-	add.l		#\2,d2
+	move.l	\3,A0
+	add.l		#\2,A0
 	LINKLIB	_LVOWriteChipByte,chipsetBase
 	endm
 

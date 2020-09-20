@@ -49,3 +49,61 @@ void _setCIATimingAccuracy( int us )
 	cia_latency_us = us;
 }
 
+//--
+
+void _bitChgChipLong(char * offset, ULONG bit)
+{
+	ULONG value = longget( (ULONG) offset);
+	longput( (ULONG) offset, value ^ (1L << bit));
+}
+
+void _bitChgChipWord(char * offset, ULONG bit)
+{
+	ULONG value = wordget( (ULONG) offset);
+	wordput( (ULONG) offset, value ^ (1L << bit));
+}
+
+void _bitChgChipByte(char * offset, ULONG bit)
+{
+	ULONG value = byteget( (ULONG) offset);
+	byteput( (ULONG) offset, value ^ (1L << bit));
+}
+
+void _bitSetChipLong(char * offset, ULONG bit)
+{
+	ULONG value = longget( (ULONG) offset);
+	longput( (ULONG) offset, value | (1L << bit));
+}
+
+void _bitSetChipWord(char * offset, ULONG bit)
+{
+	ULONG value = wordget( (ULONG) offset);
+	wordput( (ULONG) offset, value | (1L << bit));
+}
+
+void _bitSetChipByte(char * offset, ULONG bit)
+{
+	ULONG value = byteget( (ULONG) offset);
+	byteput( (ULONG) offset, value | (1L << bit));
+}
+
+void _bitClrChipLong(char * offset, ULONG bit)
+{
+	ULONG value = longget( (ULONG) offset);
+	longput( (ULONG) offset, value & ~(1L << bit));
+}
+
+void _bitClrChipWord(char * offset, ULONG bit)
+{
+	ULONG value = wordget( (ULONG) offset);
+	wordput( (ULONG) offset, value & ~(1L << bit));
+}
+
+void _bitClrChipByte(char * offset, ULONG bit)
+{
+	ULONG value = byteget( (ULONG) offset);
+	byteput( (ULONG) offset, value & ~(1L << bit));
+}
+
+
+

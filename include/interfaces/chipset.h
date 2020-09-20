@@ -45,6 +45,15 @@ struct chipsetIFace
 	ULONG APICALL (*readChipLong)(struct chipsetIFace *Self, char * offset);
 	ULONG APICALL (*readChipWord)(struct chipsetIFace *Self, char * offset);
 	ULONG APICALL (*readChipByte)(struct chipsetIFace *Self, char * offset);
+	void APICALL (*bitChgChipLong)(struct chipsetIFace *Self, char * offset, ULONG value);
+	void APICALL (*bitChgChipWord)(struct chipsetIFace *Self, char * offset, ULONG bit);
+	void APICALL (*bitChgChipByte)(struct chipsetIFace *Self, char * offset, ULONG bit);
+	void APICALL (*bitSetChipLong)(struct chipsetIFace *Self, char * offset, ULONG bit);
+	void APICALL (*bitSetChipWord)(struct chipsetIFace *Self, char * offset, ULONG bit);
+	void APICALL (*bitSetChipByte)(struct chipsetIFace *Self, char * offset, ULONG bit);
+	void APICALL (*bitClrChipLong)(struct chipsetIFace *Self, char * offset, ULONG bit);
+	void APICALL (*bitClrChipWord)(struct chipsetIFace *Self, char * offset, ULONG bit);
+	void APICALL (*bitClrChipByte)(struct chipsetIFace *Self, char * offset, ULONG bit);
 	void APICALL (*setCIATimingAccuracy)(struct chipsetIFace *Self, int us);
 };
 

@@ -41,6 +41,46 @@
 		<method name="readChipByte" result="ULONG">
 			<arg name="offset" type="char *"/>
 		</method>
+
+		<method name="bitChgChipLong" result="void">
+			<arg name="offset" type="char *"/>
+			<arg name="value" type="ULONG"/>
+		</method>
+		<method name="bitChgChipWord" result="void">
+			<arg name="offset" type="char *"/>
+			<arg name="bit" type="ULONG"/>
+		</method>
+		<method name="bitChgChipByte" result="void">
+			<arg name="offset" type="char *"/>
+			<arg name="bit" type="ULONG"/>
+		</method>
+
+		<method name="bitSetChipLong" result="void">
+			<arg name="offset" type="char *"/>
+			<arg name="bit" type="ULONG"/>
+		</method>
+		<method name="bitSetChipWord" result="void">
+			<arg name="offset" type="char *"/>
+			<arg name="bit" type="ULONG"/>
+		</method>
+		<method name="bitSetChipByte" result="void">
+			<arg name="offset" type="char *"/>
+			<arg name="bit" type="ULONG"/>
+		</method>
+
+		<method name="bitClrChipLong" result="void">
+			<arg name="offset" type="char *"/>
+			<arg name="bit" type="ULONG"/>
+		</method>
+		<method name="bitClrChipWord" result="void">
+			<arg name="offset" type="char *"/>
+			<arg name="bit" type="ULONG"/>
+		</method>
+		<method name="bitClrChipByte" result="void">
+			<arg name="offset" type="char *"/>
+			<arg name="bit" type="ULONG"/>
+		</method>
+
 		<method name="setCIATimingAccuracy" result="void">
 			<arg name="us" type="int"/>
 		</method>

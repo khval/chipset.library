@@ -123,15 +123,17 @@ busy_wait:
 
 ;        bchg.b  #CIAB_LED,ciapra(a4)    ;Blink light
 
-	chipReadByte ciapra,a4,d1
-	eor.b	#CIAB_LED,d1
-	chipWriteByte d1,ciapra,a4
+	move.l	#CIAB_LED,d1
+	move.l	A4,A0
+	add.l		#ciapra,A0
+	LINKLIB	_LVOBitChgChipByte,chipsetBase
 
 ;        bset.b  #0,ciacra(a4)           ;Restart timer
 
-	chipReadByte ciapra,a4,d1
-	or.b	#1,d1
-	chipWriteByte d1,ciapra,a4
+	move.l	#0,d1
+	move.l	A4,A0
+	add.l		#ciapra,A0
+	LINKLIB	_LVOBitSetChipByte,chipsetBase
 
 	bra.s   busy_wait
 

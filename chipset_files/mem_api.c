@@ -1,7 +1,11 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+
+#define __USE_INLINE__
+
 #include <proto/exec.h>
+#include <proto/dos.h>
 
 #include "uade/sysconfig.h"
 #include "uade/sysdeps.h"

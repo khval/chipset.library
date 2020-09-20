@@ -26,6 +26,10 @@ STATIC ULONG stub_Reserved_ppc(ULONG *regarray);
 
 STATIC ULONG stub_allocChip_ppc(ULONG *regarray);
 STATIC VOID stub_freeChip_ppc(ULONG *regarray);
+
+STATIC ULONG stub_hostAddressToChip_ppc(ULONG *regarray);
+STATIC ULONG stub_chipAddressToHost_ppc(ULONG *regarray);
+
 STATIC VOID stub_writeChipLong_ppc(ULONG *regarray);
 STATIC VOID stub_writeChipWord_ppc(ULONG *regarray);
 STATIC VOID stub_writeChipByte_ppc(ULONG *regarray);
@@ -42,6 +46,8 @@ const struct EmuTrap stub_Reserved = { TRAPINST, TRAPTYPE, (void *) stub_Reserve
 
 const struct EmuTrap stub_allocChip = { TRAPINST, TRAPTYPE, (void *) stub_allocChip_ppc };
 const struct EmuTrap stub_freeChip = { TRAPINST, TRAPTYPE, (void *) stub_freeChip_ppc };
+const struct EmuTrap stub_hostAddressToChip = { TRAPINST, TRAPTYPE, (void *) stub_hostAddressToChip_ppc };
+const struct EmuTrap stub_chipAddressToHost = { TRAPINST, TRAPTYPE, (void *) stub_chipAddressToHost_ppc };
 const struct EmuTrap stub_writeChipLong = { TRAPINST, TRAPTYPE, (void *) stub_writeChipLong_ppc };
 const struct EmuTrap stub_writeChipWord = { TRAPINST, TRAPTYPE, (void *) stub_writeChipWord_ppc };
 const struct EmuTrap stub_writeChipByte = { TRAPINST, TRAPTYPE, (void *) stub_writeChipByte_ppc };
@@ -58,6 +64,8 @@ const ULONG VecTable68K[] = {
 	(ULONG) &stub_Reserved,
 	(ULONG) &stub_allocChip,
 	(ULONG) &stub_freeChip,
+	(ULONG) &stub_hostAddressToChip,
+	(ULONG) &stub_chipAddressToHost,
 	(ULONG) &stub_writeChipLong,
 	(ULONG) &stub_writeChipWord,
 	(ULONG) &stub_writeChipByte,
@@ -118,6 +126,20 @@ STATIC VOID stub_freeChip_ppc(ULONG *regarray)
 	Printf("%s:%s:%ld\n",__FILE__,__FUNCTION__,__LINE__);
 
 	_freeChip(regarray[REG68K_A0/4]);;
+}
+
+STATIC ULONG stub_hostAddressToChip_ppc(ULONG *regarray)
+{
+	Printf("%s:%s:%ld\n",__FILE__,__FUNCTION__,__LINE__);
+
+	return (APTR) regarray[REG68K_D0/4];
+}
+
+STATIC ULONG stub_chipAddressToHost_ppc(ULONG *regarray)
+{
+	Printf("%s:%s:%ld\n",__FILE__,__FUNCTION__,__LINE__);
+
+	return (APTR) regarray[REG68K_D0/4];
 }
 
 STATIC VOID stub_writeChipLong_ppc(ULONG *regarray)

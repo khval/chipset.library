@@ -46,45 +46,64 @@ _LVOHostAddressToChip	EQU -42
 
 	; D0 returns CHIP address (virtual address)
 
-_LVOChipAddressToHost	EQU -42
+_LVOChipAddressToHost	EQU -48
 
 	; D0 returns native address
 
-_LVOWriteChipLong	EQU -48
+_LVOWriteChipLong	EQU -54
 
 	; A0 address in chip (virtual mem)
 	; D1 value to set
 
-_LVOWriteChipWord	EQU -54
+_LVOWriteChipWord	EQU -60
 
 	; A0 address in chip (virtual mem)
 	; D1 value to set
 
-_LVOWriteChipByte	EQU -60
+_LVOWriteChipByte	EQU -66
 
 	; A0 address in chip (virtual mem)
 	; D1 value to set
 
-_LVOReadChipLong	EQU -66
+_LVOReadChipLong	EQU -72
 
 	; A0 address in chip (virtual mem)
 	; D0 return value
 
-_LVOReadChipWord	EQU -72
+_LVOReadChipWord	EQU -78
 
 	; A0 address in chip (virtual mem)
 	; D0 return value
 
-_LVOReadChipByte	EQU -78
+_LVOReadChipByte	EQU -84
 
 	; A0 address in chip (virtual mem)
 	; D0 return value
 
-_LVOSetCIATimingAccuracy	EQU -84
+_LVOSetCIATimingAccuracy	EQU -90
 
 	; Because its not ideal to use 100% cpu time to emulate one chip
 	; this timer sets how often the chip should wake up, and take care of timing (and count CPU cycles)
 	; On real hardware you don't need to worry about this.
 
 	; D1 sets mciro seconds accuracy, 
+
+; chipReadByte sourceOffset,sourceReg,DestReg
+
+chipReadByte		macro 
+	move.l	\2,d1
+	add.l		#\1,d1
+	LINKLIB	_LVOReadChipByte,chipsetBase
+	move.l	d0,\3
+	endm
+
+; chipWriteByte sourceReg/Value,destOffset,DestReg
+; chipWriteByte sourceValue,destOffset,DestReg
+
+chipWriteByte		macro 
+	move.l	\1,d1
+	move.l	\3,d2
+	add.l		#\2,d2
+	LINKLIB	_LVOWriteChipByte,chipsetBase
+	endm
 

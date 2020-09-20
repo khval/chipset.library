@@ -16,7 +16,8 @@ inc=-Isdk31: -Isdk31:includes/include_i
 tests = openlib.exe	\
 	chipmem.exe \
 	timeing.exe \
-	probe.exe
+	probe.exe \
+	bitchg.exe
 
 all:	${tests} 
 
@@ -40,6 +41,10 @@ timeing.exe: timeing.s
 probe.exe: probe.s
 		$(compiler) $(options) $(inc) -Fhunk -o obj/probe.o probe.s 
 		$(link) -bamigahunk -o probe.exe -s  obj/probe.o
+
+bitchg.exe: bitchg.s
+		$(compiler) $(options) $(inc) -Fhunk -o obj/bitchg.o bitchg.s 
+		$(link) -bamigahunk -o bitchg.exe -s  obj/bitchg.o
 
 .PRECIOUS: %.hunk 
 

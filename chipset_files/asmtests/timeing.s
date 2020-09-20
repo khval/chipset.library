@@ -125,13 +125,13 @@ busy_wait:
 
 	chipReadByte ciapra,a4,d1
 	eor.b	#CIAB_LED,d1
-	chipWriteByte d0,ciapra,a4
+	chipWriteByte d1,ciapra,a4
 
 ;        bset.b  #0,ciacra(a4)           ;Restart timer
 
 	chipReadByte ciapra,a4,d1
 	or.b	#1,d1
-	chipWriteByte d0,ciapra,a4
+	chipWriteByte d1,ciapra,a4
 
 	bra.s   busy_wait
 

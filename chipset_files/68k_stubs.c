@@ -161,14 +161,16 @@ STATIC ULONG stub_hostAddressToChip_ppc(ULONG *regarray)
 {
 	Printf("%s:%s:%ld\n",__FILE__,__FUNCTION__,__LINE__);
 
-	return (APTR) regarray[REG68K_D0/4];
+	regarray[REG68K_D0/4] = (ULONG) _hostAddressToChip( (APTR) regarray[REG68K_A0/4]);
+	return  regarray[REG68K_D0/4];
 }
 
 STATIC ULONG stub_chipAddressToHost_ppc(ULONG *regarray)
 {
 	Printf("%s:%s:%ld\n",__FILE__,__FUNCTION__,__LINE__);
 
-	return (APTR) regarray[REG68K_D0/4];
+	regarray[REG68K_D0/4] = (ULONG) _chipAddressToHost( (APTR) regarray[REG68K_A0/4]);
+	return  regarray[REG68K_D0/4];
 }
 
 STATIC VOID stub_writeChipLong_ppc(ULONG *regarray)

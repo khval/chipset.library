@@ -118,6 +118,9 @@ busy_wait:
 
 	beq.s   busy_wait
 
+	lea	txtBlinkLed(pc),a1
+	jsr	_writeText
+
 ;        bchg.b  #CIAB_LED,ciapra(a4)    ;Blink light
 
 	chipReadByte ciapra,a4,d1
@@ -161,6 +164,10 @@ chipsetBase
 txtLibsOpen:
 	dc.l	14
 	dc.b "Libs are open",$A,0
+
+txtBlinkLed:
+	dc.l	10
+	dc.b "blink led",$A,0
 
 txtReadByteOk:
 	dc.l	13

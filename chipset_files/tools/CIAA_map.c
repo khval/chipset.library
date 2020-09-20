@@ -30,7 +30,7 @@ struct Window *My_Window = NULL;
 	IDCMP_EXTENDEDMOUSE | IDCMP_CLOSEWINDOW | IDCMP_NEWSIZE | IDCMP_INTUITICKS | IDCMP_MENUPICK | IDCMP_GADGETUP
 
 #define window_height 340
-#define window_width 220
+#define window_width 320
 int window_left = 640 - window_width;
 int window_top = 30;
 
@@ -95,14 +95,30 @@ void print_item(int i, int y)
 {
 	char hex[20];
 
-	Move( My_Window -> RPort, 20,y+20 );
-	Text( My_Window -> RPort, list[i].name, strlen(list[i].name));
+	sprintf(hex,"%08x", list[i].addr);
 
-	sprintf(hex,"%08x",readChipByte( list[i].addr));
+	Move( My_Window -> RPort, 20,y+20 );
+	Text( My_Window -> RPort, hex, strlen(hex) );
 
 	Move( My_Window -> RPort, 120,y+20 );
+	Text( My_Window -> RPort, list[i].name, strlen(list[i].name));
+
+	sprintf(hex,"%08x",spyCIAA( list[i].addr));
+
+	Move( My_Window -> RPort, 220,y+20 );
 	Text( My_Window -> RPort, hex, strlen(hex) );
 }
+
+void update_print_item(int i, int y)
+{
+	char hex[20];
+
+	sprintf(hex,"%08x",spyCIAA( list[i].addr));
+
+	Move( My_Window -> RPort, 220,y+20 );
+	Text( My_Window -> RPort, hex, strlen(hex) );
+}
+
 
 void show_stats()
 {
@@ -112,29 +128,24 @@ void show_stats()
 
 	SetAPen( My_Window -> RPort, 1 );
 
-
 	for (i=0;list[i].addr;i++)
 	{
 		print_item( i, y+ i * 20 );
 	}
+}
 
-/*
+void update_show_stats()
+{
+	int i,x,y;
+	x = My_Window -> BorderLeft;
+	y = My_Window -> BorderTop;
 
-	int w2 = window_width / 2;
+	SetAPen( My_Window -> RPort, 1 );
 
-
-
-	RectFillColor ( My_Window -> RPort, 
-		x,y,
-		x+w2-1, y+window_height, 
-		powerLed ? 0xFF00FF00 : 0xFF00AA00 );
-
-	RectFillColor ( My_Window -> RPort, 
-		x+w2,y, 
-		x+window_width, y+window_height, 
-		diskLed ? 0xFFFF0000 : 0xFFAA0000 );
-
-*/
+	for (i=0;list[i].addr;i++)
+	{
+		update_print_item( i, y+ i * 20 );
+	}
 }
 
 bool running = true;
@@ -160,7 +171,6 @@ struct CIA *_ciaa = 0xbfe001;
 
 int main()
 {
-	ULONG ciacra;
 
 	if (init() == FALSE)
 	{
@@ -174,13 +184,13 @@ int main()
 		return 0;
 	}
 
+	show_stats();
+
 	do
 	{
 		events();
 
-		ciacra = readChipByte(&(_ciaa ->ciacra));
-
-		show_stats();
+		update_show_stats();
 		Delay(1);
 	} while ( running);
 

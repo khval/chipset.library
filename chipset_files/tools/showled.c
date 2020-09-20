@@ -30,7 +30,7 @@ struct Window *My_Window = NULL;
 	IDCMP_EXTENDEDMOUSE | IDCMP_CLOSEWINDOW | IDCMP_NEWSIZE | IDCMP_INTUITICKS | IDCMP_MENUPICK | IDCMP_GADGETUP
 
 #define window_height 30
-#define window_width 100
+#define window_width 150
 int window_left = 640 - window_width;
 int window_top = 30;
 
@@ -124,7 +124,7 @@ int main()
 	{
 		events();
 
-		ciacra = readChipByte(&(_ciaa ->ciacra));
+		ciacra = spyCIAA(&(_ciaa ->ciacra));
 
 		powerLed = ciacra & CIAB_LED ? true : false;
 

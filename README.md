@@ -21,7 +21,7 @@ time lags caused by interruptions in the task scheduler.
 
 # Soft chip.
 
-    **Advantages**
+**Advantages**
 
         * Easy to debug (It’s easy to control, adjust speed, and on on.)
 
@@ -29,14 +29,15 @@ time lags caused by interruptions in the task scheduler.
 
         * Can be Upgraded. (however legacy support is way it exists.)
 
-    **Disadvantages**
+**Disadvantages**
     
         * Busy loops (pulling state from CIAA/B) can effect the timing due to overall drain on CPU resources.
-        (It can affect pression, but overall timing is calculated based on eclipsed time (delta values), so is not affected.)
+        (It can affect pression, but overall timing is calculated based on eclipsed time (delta values),
+        so is not affected.)
 
 # FPGA on a PCIE slot.
 
-    **Advantages**
+**Advantages**
 
         * Easy to debug (It’s easy to control, adjust speed, and on on.)
 
@@ -44,18 +45,18 @@ time lags caused by interruptions in the task scheduler.
 
         * Can be Upgraded. (however legacy support is way it exists.)
         
-    **Disadvantages**
+**Disadvantages**
 
         Takes up a PCI or PCIE slot.
 
 # Real CIAA/CIAB Hardware
 
-    **Advantages**
+ **Advantages**
 
         You can easily switch between softchip and realchip, 
         using compiler flags, taking advantage of debug features.
         
-    **Disadvantages**
+ **Disadvantages**
 
         Someone needs to write a 680x0 version of this library
         

@@ -62,8 +62,8 @@ time lags caused by interruptions in the task scheduler.
         
 # XMOS chip on AmigaONE.
 
-    As I understand it, it’s not easy to interface one chip, what is true or not, 
-    is not known, what is true is that the SDK on works on Windows, so that sucks.
+       As I understand it, it’s not easy to interface to the chip, what is true or not, 
+       is not known, what is true is that the SDK on only works on Windows, so that sucks.
 
 # Dependencies
 

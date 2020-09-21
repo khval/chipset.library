@@ -39,7 +39,7 @@ int htick = 0;
 
 #define _50Hz_period_us 20000.0f
 
-float cia_time_us = 100000.0f / 70938.92f;
+double cia_time_us = 100000.0f / 70938.92f ;
 double _50Hz_period_us_cnt = 0;
 
 // 240 scanlines for PAL screen

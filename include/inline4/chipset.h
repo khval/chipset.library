@@ -48,5 +48,6 @@
 #define setCIATimingAccuracy(us) Ichipset->setCIATimingAccuracy((us)) 
 #define spyCIAA(Addr) Ichipset->spyCIAA((Addr)) 
 #define spyCIAB(Addr) Ichipset->spyCIAB((Addr)) 
+#define setCIAClockSpeed(us) Ichipset->setCIAClockSpeed((us)) 
 
 #endif /* INLINE4_CHIPSET_H */

@@ -93,6 +93,10 @@
 			<arg name="Addr" type="ULONG"/>
 		</method>
 
+		<method name="setCIAClockSpeed" result="void">
+			<arg name="us" type="double"/>
+		</method>
+
 	</interface>
 </library>
 

@@ -50,7 +50,18 @@ extern uint32_t cia_latency_us;
 
 void _setCIATimingAccuracy( int us )
 {
+	Printf("%s:%s:%ld\n",__FILE__,__FUNCTION__,__LINE__);
+
 	cia_latency_us = us;
+}
+
+extern double cia_time_us;
+
+void _setCIAClockSpeed(double us)
+{
+	Printf("%s:%s:%ld\n",__FILE__,__FUNCTION__,__LINE__);
+
+	 cia_time_us = us;
 }
 
 //--
@@ -69,6 +80,7 @@ void _bitChgChipWord(char * offset, ULONG bit)
 
 void _bitChgChipByte(char * offset, ULONG bit)
 {
+	Printf("%s:%s:%ld\n",__FILE__,__FUNCTION__,__LINE__);
 	ULONG value = byteget( (ULONG) offset);
 	byteput( (ULONG) offset, value ^ (1L << bit));
 }

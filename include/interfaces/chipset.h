@@ -57,6 +57,7 @@ struct chipsetIFace
 	void APICALL (*setCIATimingAccuracy)(struct chipsetIFace *Self, int us);
 	ULONG APICALL (*spyCIAA)(struct chipsetIFace *Self, ULONG Addr);
 	ULONG APICALL (*spyCIAB)(struct chipsetIFace *Self, ULONG Addr);
+	ULONG APICALL (*setCIAClockSpeed)(struct chipsetIFace *Self, ULONG us);
 };
 
 #ifdef __cplusplus

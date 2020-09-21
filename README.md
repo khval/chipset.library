@@ -25,7 +25,8 @@ time lags caused by interruptions in the task scheduler.
 
         * Easy to debug (It’s easy to control, adjust speed, and on on.)
 
-        * Easy to monitor (On real CIAA/B timer you can’t read the CIA register without modifying or changing states, we have workaround with spy functions.)
+        * Easy to monitor (On real CIAA/B timer you can’t read the CIA register without modifying
+        or changing states, we have a workaround with spy functions.)
 
         * Can be Upgraded. (however legacy support is way it exists.)
 
@@ -41,7 +42,8 @@ time lags caused by interruptions in the task scheduler.
 
         * Easy to debug (It’s easy to control, adjust speed, and on on.)
 
-        * Easy to monitor (On real CIAA/B timer you can’t read the CIA register with modifying or changing states.)
+        * Easy to monitor (On real CIAA/B timer you can’t read the CIA register without modifying
+        or changing states, we have a workaround with spy functions.)
 
         * Can be Upgraded. (however legacy support is way it exists.)
         

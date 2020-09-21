@@ -3,7 +3,8 @@
 
 main_SRCS = showled.c \
 			CIAA_map.c \
-			quit.c
+			quit.c \
+			SetCIAClockSpeed.c
 
 deps = lib.o
 

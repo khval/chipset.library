@@ -58,7 +58,7 @@ time lags caused by interruptions in the task scheduler.
        * You can easily switch between softchip and realchip, 
        using compiler flags, taking advantage of debug features.
         
-       * The API can enable 68k software to used enhanced versions
+       * The API can enable 68k software to use enhanced versions
        of chipset on Zorro or Trapdoor expansion.
         
  **Disadvantages**

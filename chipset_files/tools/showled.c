@@ -126,7 +126,7 @@ int main()
 
 		ciacra = spyCIAA(&(_ciaa ->ciacra));
 
-		powerLed = ciacra & CIAB_LED ? true : false;
+		powerLed = ciacra & (1<<CIAB_LED) ? true : false;
 
 		draw_leds();
 		Delay(1);

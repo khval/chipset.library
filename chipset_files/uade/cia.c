@@ -5,8 +5,10 @@
   *
   * Copyright 1995 Bernd Schmidt, Alessandro Bissacco
   * Copyright 1996, 1997 Stefan Reinauer, Christian Schmitt
+  * Copyright 2020 Kjetil Hvalstrand
   */
 
+#include "stdint.h"
 #include "sysconfig.h"
 #include "sysdeps.h"
 #include <assert.h>
@@ -99,33 +101,48 @@ static void RethinkICRB(void)
     }
 }
 
-static int lastdiv10;
+static uint16_t lastdiv10;
 
 static void CIA_update(void) // used by cia_handler
 {
-    unsigned long int ccount = cycles - eventtab[ev_cia].oldcycles + lastdiv10;
-    unsigned long int ciaclocks = ccount / DIV10;
+	uint16_t ccount,ciaclocks ;
+	int aovfla = 0, aovflb = 0, bovfla = 0, bovflb = 0;
 
-    int aovfla = 0, aovflb = 0, bovfla = 0, bovflb = 0;
+	ccount = cycles - eventtab[ev_cia].oldcycles;
+	ccount += lastdiv10;
 
-    lastdiv10 = div10;
-    div10 = ccount % DIV10;
+	ciaclocks = ccount / DIV10;
 
-    /* CIA A timers */
-    if ((ciaacra & 0x21) == 0x01) {
+	lastdiv10 = div10;
+	div10 = ccount % DIV10;
 
-	if ((ciaata+1) == ciaclocks) {
-	    aovfla = 1;
-	    if ((ciaacrb & 0x61) == 0x41) {
-		if (ciaatb-- == 0) aovflb = 1;
-	    }
+	/* CIA A timers */
+	if ((ciaacra & 0x21) == 0x01) {
+
+	if (ciaclocks)
+	{
+		if (ciaata <= ciaclocks)
+		{
+			aovfla = 1;
+			if ((ciaacrb & 0x61) == 0x41)
+			{
+				if (ciaatb-- == 0) aovflb = 1;
+			}
+
+			ciaata -= ciaata ;
+		}
+		else
+		{
+			ciaata -= ciaclocks;
+		}
 	}
-	ciaata -= ciaclocks;
+	else Printf("No CIA clock\n");
     }
+
     if ((ciaacrb & 0x61) == 0x01) {
 	assert((ciaatb+1) >= ciaclocks);
 	if ((ciaatb+1) == ciaclocks) aovflb = 1;
-	ciaatb -= ciaclocks;
+	ciaatb -= ciaatb < ciaclocks ? ciaatb : ciaclocks;
     }
 
     /* CIA B timers */
@@ -145,23 +162,27 @@ static void CIA_update(void) // used by cia_handler
 	ciabtb -= ciaclocks;
     }
     if (aovfla) {
-	ciaaicr |= 1; RethinkICRA();
-	ciaata = ciaala;
+	Printf("ciaaicr bit 1 is true\n");
+
+	ciaaicr |= 1; 
+	Delay(1);
+	RethinkICRA();
+	ciaata = ciaala;					// reset timer
 	if (ciaacra & 0x8) ciaacra &= ~1;
     }
     if (aovflb) {
 	ciaaicr |= 2; RethinkICRA();
-	ciaatb = ciaalb;
+	ciaatb = ciaalb;					// reset timer
 	if (ciaacrb & 0x8) ciaacrb &= ~1;
     }
     if (bovfla) {
 	ciabicr |= 1; RethinkICRB();
-	ciabta = ciabla;
+	ciabta = ciabla;					// reset timer
 	if (ciabcra & 0x8) ciabcra &= ~1;
     }
     if (bovflb) {
 	ciabicr |= 2; RethinkICRB();
-	ciabtb = ciablb;
+	ciabtb = ciablb;					// reset timer
 	if (ciabcrb & 0x8) ciabcrb &= ~1;
     }
 }
@@ -226,8 +247,8 @@ static void CIA_calctimers(void)
 
 void CIA_handler(void)
 {
-    CIA_update();
-    CIA_calctimers();
+	CIA_update();
+	CIA_calctimers();
 }
 
 void diskindex_handler(void)

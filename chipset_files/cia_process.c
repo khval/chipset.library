@@ -11,9 +11,9 @@
 #include <proto/exec.h>
 #include <proto/dos.h>
 
-unsigned long int cycles = 0;
+uint16_t cycles = 0;
 struct ev eventtab[ev_max];
-unsigned long int nextevent =0 ;
+uint32_t nextevent =0 ;
 int custom_bank = 0;
 
 
@@ -80,7 +80,7 @@ uint32_t cia_latency_us = 83;
 	TimerIO->Request.io_Command = TR_ADDREQUEST;		\
 	TimerIO->Time.Seconds=0;							\
 	TimerIO->Time.Microseconds = cia_latency_us;						\
-	DoIO(TimerIO);
+	DoIO( (struct IORequest *) TimerIO);
 
 struct MsgPort			*TimerMP = NULL;
 struct TimeRequest		*TimerIO = NULL;
@@ -93,8 +93,9 @@ extern struct _Library *libBase_debug;
 
 void cia_process_fn ()
 {
-	int microseconds = NULL;
-	int count;
+	uint32_t microseconds = 0;
+	uint16_t count;
+	uint16_t delta;
 
 	Printf("init timer.device...\n");
 
@@ -107,12 +108,16 @@ void cia_process_fn ()
 		setTimerIO();
 		gettimeofday(&end,NULL);
 
-		microseconds += (double) ((end.tv_usec - start.tv_usec) + (end.tv_sec - start.tv_sec) * 1000000);
-		count = (int) (microseconds / cia_time_us);
+		microseconds += (uint32_t) ((end.tv_usec - start.tv_usec) + (end.tv_sec - start.tv_sec) * 1000000);
+		count = (int16_t) ( (double) microseconds / cia_time_us);
 		microseconds-= cia_time_us * (double) count; 
 
 		// 1 cia time = 10 cpu cycles, (Amiga500)
+
+		delta = (10*count);	
 		cycles+=(10 *count);
+
+		Printf("do timer\n");
 
 		do_cia(cia_time_us * count);
 		start = end;

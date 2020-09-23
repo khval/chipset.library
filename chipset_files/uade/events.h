@@ -12,7 +12,8 @@
 extern void reset_frame_rate_hack (void);
 extern int rpt_available;
 
-extern unsigned long int cycles, nextevent, is_lastline;
+extern uint16_t cycles;
+extern uint32_t nextevent, is_lastline;
 extern unsigned long int sample_evtime;
 typedef void (*evfunc)(void);
 
@@ -33,7 +34,7 @@ extern struct ev eventtab[ev_max];
 
 static void events_schedule (void)
 {
-  unsigned long int mintime = ~0L;
+	uint16_t mintime = ~0L;
   unsigned long int eventtime;
   /* HSYNC */
   if(eventtab[ev_hsync].active) {

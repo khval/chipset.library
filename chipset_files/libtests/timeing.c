@@ -1,12 +1,14 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdio.h>
-#include <proto/exec.h>
+
 #include "hardware/cia.h"
 #include "hardware/custom.h"
 
 #define __USE_INLINE__
 
+#include <proto/exec.h>
+#include <proto/dos.h>
 #include <proto/chipset.h>
 
 struct chipsetIFace * Ichipset = NULL;
@@ -45,20 +47,25 @@ struct Library *chipsetBase = NULL;
 ;
 */
 
-// Not supported by chipset.library, this OCS/AGA chipset
+
 
 #define TIME 2148
 
 // _ciaa is on an ODD address (e.g. the low byte) -- $bfe001
 // _ciab is on an EVEN address (e.g. the high byte) -- $bfd000
 
-struct CIA *_ciaa = 0xbfe001;
+struct CIA *_ciaa = (struct CIA *) 0xbfe001;
+
+
 
 int main()
 {
-        uint32_t d0;
-        uint32_t a4 = _ciaa;
+	uint32_t icr;
+	uint32_t d0;
+
 /*
+;	 Not supported by chipset.library, this OCS/AGA chipset
+
         move.w  #$7fff,dmacon(a3)       ; Kill all chip interrupts
 ;
 */
@@ -68,6 +75,8 @@ int main()
                 close_libs();
                 return 0;                
         }
+
+//	setCIAClockSpeed(500.0);
 
         d0 = readChipByte( &(_ciaa ->ciacra));
         d0 &= (0x80 | 0x40);
@@ -108,10 +117,11 @@ TIME    equ     2148
 
 	for (;;)        // busy wait
 	{
-                if (1&readChipByte(&(_ciaa ->ciaicr))) continue;                        // Wait for timer expired flag
-                writeChipByte(&(_ciaa ->ciacra),CIAB_LED ^ readChipByte(&(_ciaa ->ciacra)));     // blink light
-                writeChipByte(&(_ciaa ->ciacra),1|readChipByte(&(_ciaa ->ciacra)));             // Restart timer
+		icr = readChipByte(&(_ciaa ->ciaicr));
+		if ((1&icr)==0) continue;                        // Wait for timer expired flag
 
+		bitChgChipByte(&(_ciaa ->ciacra),CIAB_LED);     // blink light
+		bitSetChipByte(&(_ciaa ->ciacra),0);             // Restart timer
 		if (readChipByte(0x00000000) == 0xFF) break;
         }
 

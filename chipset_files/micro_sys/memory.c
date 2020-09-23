@@ -25,7 +25,9 @@
 #include <stdio.h>
 #include <stdbool.h>
 
+#define __USE_INLINE__
 #include <proto/exec.h>
+#include <proto/dos.h>
 
 #include "micro_sys/memory.h"
 
@@ -66,7 +68,7 @@ void grow_mem_list( int n )
 
 bool init_mem()
 {
-	printf("%s:%s:%d\n",__FILE__,__FUNCTION__,__LINE__);
+	Printf("%s:%s:%ld\n",__FILE__,__FUNCTION__,__LINE__);
 
 	mem_list.allocated = 0;
 	mem_list.used = 0;

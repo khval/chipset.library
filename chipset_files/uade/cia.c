@@ -247,8 +247,10 @@ static void CIA_calctimers(void)
 
 void CIA_handler(void)
 {
+	cia_lock();
 	CIA_update();
 	CIA_calctimers();
+	cia_unlock();
 }
 
 void diskindex_handler(void)
@@ -383,12 +385,16 @@ static uae_u8 ReadCIAA(unsigned int addr)
 	if (ciaasdr == 1) ciaasdr_unread = 2;
 	return ciaasdr;
      case 13:			// icr
-	tmp = ciaaicr; ciaaicr = 0; RethinkICRA(); return tmp;
+	cia_lock();
+	tmp = ciaaicr; ciaaicr = 0; RethinkICRA(); 
+	cia_unlock();
+	return tmp;
      case 14:			// cra
 	return ciaacra;
      case 15:			// crb
 	return ciaacrb;
     }
+
     return 0;
 }
 
@@ -478,7 +484,9 @@ static uae_u8 ReadCIAB(unsigned int addr)
      case 12:
 	return ciabsdr;
      case 13:
+	cia_lock();
 	tmp = ciabicr; ciabicr = 0; RethinkICRB();
+	cia_unlock();
 	return tmp;
      case 14:
 	return ciabcra;
@@ -491,6 +499,8 @@ static uae_u8 ReadCIAB(unsigned int addr)
 void WriteCIAA(uae_u16 addr,uae_u8 val)
 {
     int oldled, oldovl;
+	cia_lock();
+
     switch(addr & 0xf) {
      case 0:					// pra
 	oldovl = ciaapra & 1;
@@ -631,11 +641,15 @@ void WriteCIAA(uae_u16 addr,uae_u8 val)
 	CIA_calctimers();
 	break;
     }
+
+	cia_unlock();
 }
 
 void WriteCIAB(uae_u16 addr,uae_u8 val)
 {
     int oldval;
+	cia_lock();
+
     switch(addr & 0xf) {
      case 0:					// pra
         ciabpra  = val;
@@ -727,6 +741,8 @@ void WriteCIAB(uae_u16 addr,uae_u8 val)
 	CIA_calctimers();
 	break;
     }
+
+	cia_unlock();
 }
 
 void CIA_reset(void)

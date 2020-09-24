@@ -19,7 +19,16 @@
      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
-#include <dos/dos.h>
+#define __USE_INLINE__
+
+#include <stdint.h>
+#include <stdio.h>
+#include <stdarg.h>
+#include <stdbool.h>
+
+#include <proto/exec.h>
+#include <proto/dos.h>
+
 #include <exec/execbase.h>
 #include <exec/memory.h>
 #include <exec/resident.h>
@@ -44,8 +53,7 @@
 //#define DEBUG(...)	DebugPrintF(__VA_ARGS__)
 #define DEBUG(...)
 
-static BOOL
-RemapMemory( struct PUHData* pd );
+static bool puh_RemapMemory( struct PUHData* pd );
 
 
 static BOOL
@@ -439,10 +447,9 @@ ActivatePUH( struct PUHData* pd )
 ** Deactivate PUH *************************************************************
 ******************************************************************************/
 
-void
-DeactivatePUH( struct PUHData* pd )
+void DeactivatePUH( struct PUHData* pd )
 {
-  PUH_ON = FALSE;
+	PUH_ON = FALSE;
 }
 
 
@@ -450,10 +457,9 @@ DeactivatePUH( struct PUHData* pd )
 ** Activate MMU ***************************************************************
 ******************************************************************************/
 
-static BOOL
-RemapMemory( struct PUHData* pd )
+static bool puh_RemapMemory( struct PUHData* pd )
 {
-  return TRUE;
+	return TRUE;
 }
 
 

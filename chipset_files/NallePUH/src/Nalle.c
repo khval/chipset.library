@@ -19,29 +19,15 @@
 		 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
-#ifndef __amigaos4__
-#include "CompilerSpecific.h"
-#endif
+#define __USE_INLINE__
 
 #include <devices/ahi.h>
 #include <exec/errors.h>
 #include <exec/lists.h>
 #include <exec/memory.h>
-
-#ifndef NO_GUI
-#include <classes/window.h>
-#include <gadgets/listbrowser.h>
-#include <intuition/gadgetclass.h>
-#include <libraries/resource.h>
-#endif
-
-#include <clib/alib_protos.h>
 #include <proto/ahi.h>
 #include <proto/dos.h>
 #include <proto/exec.h>
-#include <proto/utility.h>
-#include <proto/intuition.h>
-#include <proto/locale.h>
 #include <proto/expansion.h>
 
 #ifndef NO_GUI
@@ -72,48 +58,24 @@ extern UBYTE pooh11_sb[];
 extern ULONG pooh11_sblen;
 
 static BOOL
-OpenLibs( void );
-
-static void
-CloseLibs( void );
-
-static BOOL
 OpenAHI( void );
 
 static void
 CloseAHI( void );
 
-static BOOL
-ShowGUI( struct PUHData* pd );
-
-static BOOL
-HandleGUI( Object* window,
-					 struct Gadget** gadgets,
-					 struct PUHData* pd );
 
 /******************************************************************************
 ** Global variables ***********************************************************
 ******************************************************************************/
 
-static struct MsgPort*			AHImp		 = NULL;
+static struct MsgPort*	AHImp		 = NULL;
 static struct AHIRequest*	 AHIio		 = NULL;
-static BYTE								 AHIDevice = IOERR_OPENFAIL;
+static BYTE			 AHIDevice = IOERR_OPENFAIL;
+struct Device*			 AHIBase	 = NULL;
 
-struct Library*			 AHIBase				 = NULL;
-struct IntuitionBase* IntuitionBase	 = NULL;
-struct Library	 *		LocaleBase			= NULL;
-struct Library*			 MMUBase				 = NULL;
-#ifndef NO_GUI
-struct Library*			 ResourceBase		= NULL;
-struct Library*			 ListBrowserBase = NULL;
-#endif
-struct UtilityBase *		 UtilityBase;
 
 #ifdef __amigaos4__
 struct AHIIFace *		 	IAHI;
-struct IntuitionIFace *	IIntuition;
-struct LocaleIFace *		ILocale;
-struct UtilityIFace * 	IUtility;
 #endif
 
 /******************************************************************************
@@ -142,11 +104,6 @@ main( int	 argc,
 	ULONG frequency = 0;
 	ULONG level		 = 0;
 
-
-	if( ! OpenLibs() )
-	{
-		return 20;
-	}
 #ifndef NO_GUI
 	if( argc == 1 && ResourceBase != NULL )
 	{
@@ -292,7 +249,6 @@ main( int	 argc,
 
 
 	CloseAHI();
-	CloseLibs();
 
 	return rc;
 }

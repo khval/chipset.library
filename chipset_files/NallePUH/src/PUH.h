@@ -22,7 +22,9 @@
 #ifndef NallePUH_PUH_h
 #define NallePUH_PUH_h
 
+#ifndef __amigaos4__
 #include "CompilerSpecific.h"
+#endif
 
 #include <exec/interrupts.h>
 #include <utility/hooks.h>
@@ -34,8 +36,11 @@ struct MMUContext;
 
 /* Debugging */
 
+#ifdef __amigaos4__
+#define KPrintFArgs	DebugPrintF
+#else
 void
-KPrintFArgs( UBYTE* fmt, 
+KPrintFArgs( UBYTE* fmt,
              LONG*  args );
 
 
@@ -44,6 +49,7 @@ KPrintFArgs( UBYTE* fmt,
   LONG _args[] = { __VA_ARGS__ };  \
   KPrintFArgs( (fmt), _args );     \
 })
+#endif
 
 
 /* Make nice accesses to hardware registers */
@@ -102,35 +108,19 @@ struct PUHData
 
   BOOL                  m_SoundOn[ 4 ];
 
+  BOOL					m_GotDatLo[4];
+  BOOL					m_GotDatHi[4];
+
   ULONG                 m_SoundLocation[ 4 ];
   ULONG                 m_SoundLength[ 4 ];
 
   void*                 m_Intercepted;
   void*                 m_CustomDirect;
-
-  struct MMUContext*    m_UserContext;
-  struct MMUContext*    m_SuperContext;
-  
-  struct ExceptionHook* m_UserException;
-  struct ExceptionHook* m_SuperException;
-
-  void*                 m_ROM;
-  void*                 m_ROMShadowBuffer;
-
-  ULONG	                m_ROMSize;
-  ULONG	                m_CustomSize;
-
-  struct
-  {  
-    ULONG               m_UserROM;
-    ULONG               m_UserROMShadow;
-    ULONG               m_UserCustom;
-    ULONG               m_SuperROM;
-    ULONG               m_SuperROMShadow;
-    ULONG               m_SuperCustom;
-  } m_Properties;
+  ULONG	               m_CustomSize;
 
   struct Interrupt     m_SoftInt;
+  struct Interrupt	  m_FaultInt;
+  struct Interrupt *	  m_OldFaultInt;
 
 };
 
@@ -148,7 +138,7 @@ SetPUHLogger( struct Hook*    hook,
               struct PUHData* pd );
 
 
-void
+void VARARGS68K
 LogPUH( struct PUHData* pd,
         STRPTR          fmt,
         ... );

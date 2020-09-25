@@ -41,9 +41,11 @@ struct ExecIFace *IExec UNUSED = NULL;
 
 struct NewlibIFace * INewlib = NULL;
 struct DOSIFace *IDOS = NULL;
+struct UtilityIFace *IUtility = NULL;
 
 struct Library *NewLibBase = NULL;
 struct Library *DOSBase = NULL;
+struct Library *UtilityBase = NULL;
 
 struct Task *main_task = NULL;	// main_task is whatever when running from a library
 struct Process *cia_process = NULL;
@@ -153,6 +155,7 @@ void close_libs()
 		cia_mx = NULL;
 	}
 
+	close_lib( UtilityBase, IUtility );
 	close_lib( DOSBase, IDOS);
 	close_lib( NewLibBase, INewlib);
 }
@@ -207,6 +210,7 @@ BOOL init()
 {
 	if ( ! open_lib( "dos.library", 53L , "main", 1, &DOSBase, (struct Interface **) &IDOS  ) ) return FALSE;
 	if ( ! open_lib( "newlib.library", 53L , "main", 1, &NewLibBase, (struct Interface **) &INewlib  ) ) return FALSE;
+	if ( ! open_lib( "utility.library", 53L , "main", 1, &UtilityBase, (struct Interface **) &IUtility  ) ) return FALSE;
 
 	cia_mx = (APTR) IExec -> AllocSysObjectTags(ASOT_MUTEX, TAG_DONE);
 	if ( ! cia_mx) return FALSE;

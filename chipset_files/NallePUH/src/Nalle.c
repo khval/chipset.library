@@ -104,15 +104,6 @@ main( int	 argc,
 	ULONG frequency = 0;
 	ULONG level		 = 0;
 
-#ifndef NO_GUI
-	if( argc == 1 && ResourceBase != NULL )
-	{
-		// Gui mode
-
-		gui_mode = TRUE;
-	}
-	else
-#endif
 	if( argc != 3 )
 	{
 		//Printf( "Usage: %s [0x]<AHI mode ID> <Frequency> <Level>\n", argv[ 0 ] );
@@ -121,37 +112,37 @@ main( int	 argc,
 		return 10;
 	}
 
-	#ifdef __amigaos4__
+#ifdef __amigaos4__
 	{
 		struct Library	*ExpansionBase;
-	 struct ExpansionIFace *IExpansion;
-	 BOOL	 Classic = TRUE;
+		struct ExpansionIFace *IExpansion;
+		BOOL	 Classic = TRUE;
 
-	 ExpansionBase = OpenLibrary( "expansion.library", 50 );
-	 GETIFACE(Expansion);
-	 if (IExpansion != NULL)
-	 {
+		ExpansionBase = OpenLibrary( "expansion.library", 50 );
+		GETIFACE(Expansion);
+		if (IExpansion != NULL)
+		{
 			STRPTR	extensions;
 
-		GetMachineInfoTags(
-			GMIT_Extensions, (ULONG) &extensions,
-			TAG_DONE );
+			GetMachineInfoTags(
+				GMIT_Extensions, (ULONG) &extensions,
+				TAG_DONE );
 
-		if (!strstr(extensions, "classic.customchips"))
+			if (!strstr(extensions, "classic.customchips"))
 				Classic = FALSE;
 
-	 	DROPIFACE(Expansion);
-	 }
+			DROPIFACE(Expansion);
+		}
 
-	 CloseLibrary(ExpansionBase);
+		CloseLibrary(ExpansionBase);
 
-	 if (Classic)
-	 {
-		 Printf( "Sorry, this program doesn't work on classic hardware\n" );
-		return 10;
-	 }
+		if (Classic)
+		{
+			Printf( "Sorry, this program doesn't work on classic hardware\n" );
+			return 10;
+		}
 	}
-	#endif
+#endif
 
 	if( ! gui_mode )
 	{
@@ -259,8 +250,7 @@ main( int	 argc,
 
 /* Opens and initializes the device. */
 
-static BOOL
-OpenAHI( void )
+static BOOL OpenAHI( void )
 {
 	BOOL rc = FALSE;
 
@@ -274,15 +264,12 @@ OpenAHI( void )
 		if( AHIio != NULL ) 
 		{
 			AHIio->ahir_Version = 4;
-			AHIDevice = OpenDevice( AHINAME,
-															AHI_NO_UNIT,
-															(struct IORequest*) AHIio,
-															0UL );
+			AHIDevice = OpenDevice( AHINAME, AHI_NO_UNIT, (struct IORequest*) AHIio, 0UL );
 
 			if( AHIDevice == 0 )
 			{
 				AHIBase = (struct Library*) AHIio->ahir_Std.io_Device;
-			GETIFACE(AHI);
+				GETIFACE(AHI);
 				rc = TRUE;
 			}
 		}
@@ -298,8 +285,7 @@ OpenAHI( void )
 
 /* Closes the device, cleans up. */
 
-static void
-CloseAHI( void )
+static void CloseAHI( void )
 {
 	if( AHIDevice == 0 )
 	{

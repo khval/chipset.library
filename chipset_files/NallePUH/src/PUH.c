@@ -75,16 +75,12 @@ RestoreMemory( struct PUHData* pd );
 UWORD PUHRead( UWORD reg, BOOL *handled );
 void PUHWrite( UWORD reg, UWORD value, BOOL *handled );
 
- SAVEDS static void
-PUHSoundFunc( REG( a0, struct Hook*						hook ),
-							REG( a2, struct AHIAudioCtrl*		actrl ),
-							REG( a1, struct AHISoundMessage* msg ) );
-
-
- SAVEDS static void
-PUHSoftInt( struct ExceptionContext *pContext, struct ExecBase *pSysBase, struct PUHData *pd );
-
+SAVEDS static void PUHSoundFunc( REG( a0, struct Hook *hook ),	REG( a2, struct AHIAudioCtrl *actrl ), REG( a1, struct AHISoundMessage* msg ) );
 //ULONG DataFaultHandler(struct ExceptionContext *pContext, struct ExecBase *pSysBase, struct PUHData *pd);
+
+SAVEDS static void PUHSoftInt( struct ExceptionContext *pContext, struct ExecBase *pSysBase, struct PUHData *pd );
+
+
 
 
 /******************************************************************************
@@ -171,7 +167,7 @@ void WriteLong( void* address, ULONG value )
 ** Initialize PUH *************************************************************
 ******************************************************************************/
 
-	struct PUHData* pd			= NULL;
+extern struct PUHData* pd;
 
 struct PUHData*
 AllocPUH( void )
@@ -1053,8 +1049,8 @@ SAVEDS static void PUHSoftInt(struct ExceptionContext *pContext, struct ExecBase
 	while (mask != 0);
 }
 
-SAVEDS static void PUHSoundFunc( REG( a0, struct Hook*						hook ),
-							REG( a2, struct AHIAudioCtrl*		actrl ),
+SAVEDS static void PUHSoundFunc( REG( a0, struct Hook *hook ),
+							REG( a2, struct AHIAudioCtrl *actrl ),
 							REG( a1, struct AHISoundMessage* msg ) )
 {
 	struct PUHData* pd		= (struct PUHData*) hook->h_Data;

@@ -72,19 +72,8 @@ static bool puh_RemapMemory( struct PUHData* pd );
 static BOOL
 RestoreMemory( struct PUHData* pd );
 
-static UWORD PUHRead( UWORD reg, BOOL *handled );
-static void PUHWrite( UWORD reg, UWORD value, BOOL *handled );
-
-
-//extern xlate_func default_xlate;
-//extern check_func default_check;
-
-addrbank nallePuh_bank = {
-    nallePuh_lget, nallePuh_wget, nallePuh_bget,
-    nallePuh_lput, nallePuh_wput, nallePuh_bput,
-    default_xlate, default_check
-};
-
+UWORD PUHRead( UWORD reg, BOOL *handled );
+void PUHWrite( UWORD reg, UWORD value, BOOL *handled );
 
  SAVEDS static void
 PUHSoundFunc( REG( a0, struct Hook*						hook ),
@@ -528,7 +517,7 @@ UWORD PUHRead( UWORD reg, BOOL *handled )
 ** Handle writes **************************************************************
 ******************************************************************************/
 	
-static void PUHWrite( UWORD	reg, UWORD value, BOOL*handled )
+void PUHWrite( UWORD	reg, UWORD value, BOOL*handled )
 {
 	UWORD* address = (UWORD*) ( (ULONG) pd->m_CustomDirect + reg );
 

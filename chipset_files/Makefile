@@ -38,7 +38,9 @@ OPT = -DNO_INLINE_MEMORY_ACCESS
 VERSION = 53
 
 nallePuh_srcs = NallePUH/src/Nalle.c \
-		NallePUH/src/PUH.c
+		NallePUH/src/api.c \
+		NallePUH/src/PUH.c 
+
 
 # "main" Interface Source Files
 main_SRCS = main/Obtain.c main/Release.c main/allocChip.c main/freeChip.c \
@@ -102,8 +104,8 @@ mem_api.o:		mem_api.c
 68k_stubs.o:	68k_stubs.c
 	gcc  -Wall -O3  $(INC)  -c -o 68k_stubs.o 68k_stubs.c
 
-NallePUH/src/PUH.o: NallePUH/src/PUH.c
-	gcc  -Wall -O3 $(INC)  -c -o NallePUH/src/PUH.o NallePUH/src/PUH.c
+NallePUH/src/%.o: NallePUH/src/%.c
+	gcc  -Wall -O3 $(INC)  -c  $(@:.o=.c) -o $@
 
 
 .PHONY: clean

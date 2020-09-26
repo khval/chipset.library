@@ -93,79 +93,11 @@ void __chkabort( void )
 ** main ***********************************************************************
 ******************************************************************************/
 
-int
-main( int	 argc,
-			char* argv[] )
+		struct PUHData* pd = NULL;
+
+int nallepuh_main(  	ULONG mode_id,ULONG frequency )
 {
 	int	 rc				= 0;
-	BOOL	gui_mode	= FALSE;
-
-	ULONG mode_id	 = 0;
-	ULONG frequency = 0;
-	ULONG level		 = 0;
-
-	if( argc != 3 )
-	{
-		//Printf( "Usage: %s [0x]<AHI mode ID> <Frequency> <Level>\n", argv[ 0 ] );
-		//Printf( "Level can be 0 (no patches), 1 (ROM patches) or 2 (appl. patches)\n" );
-	 Printf( "Usage: %s [0x]<AHI mode ID> <Frequency>\n", argv[ 0 ] );
-		return 10;
-	}
-
-#ifdef __amigaos4__
-	{
-		struct Library	*ExpansionBase;
-		struct ExpansionIFace *IExpansion;
-		BOOL	 Classic = TRUE;
-
-		ExpansionBase = OpenLibrary( "expansion.library", 50 );
-		GETIFACE(Expansion);
-		if (IExpansion != NULL)
-		{
-			STRPTR	extensions;
-
-			GetMachineInfoTags(
-				GMIT_Extensions, (ULONG) &extensions,
-				TAG_DONE );
-
-			if (!strstr(extensions, "classic.customchips"))
-				Classic = FALSE;
-
-			DROPIFACE(Expansion);
-		}
-
-		CloseLibrary(ExpansionBase);
-
-		if (Classic)
-		{
-			Printf( "Sorry, this program doesn't work on classic hardware\n" );
-			return 10;
-		}
-	}
-#endif
-
-	if( ! gui_mode )
-	{
-		char* mode_ptr;
-		char* freq_ptr;
-		char* levl_ptr;
-
-		mode_id	 = strtol( argv[ 1 ], &mode_ptr, 0 );
-		frequency = strtol( argv[ 2 ], &freq_ptr, 0 );
-		level		 = strtol( "0" /*argv[ 3 ]*/, &levl_ptr, 0 );
-	 
-		if( *mode_ptr != 0 || *freq_ptr != 0 || *levl_ptr != 0 )
-		{
-			Printf( "All arguments must be numbers.\n" );
-			return 10;
-		}
-
-		if( level > 2 )
-		{
-			Printf( "Invalid value for Level.\n" );
-			return 10;
-		}
-	}
 
 	if( ! OpenAHI() )
 	{
@@ -173,74 +105,40 @@ main( int	 argc,
 		rc = 20;
 	}
 
-	if( rc == 0 )
-	{
-		struct PUHData* pd;
-
-		pd = AllocPUH();
+	pd = AllocPUH();
 		
-		if( pd == NULL )
+	if( pd == NULL )
+	{
+		rc = 20;
+	}
+	else
+	{
+		ULONG flags = 0;
+				
+		flags = PUHF_NONE;
+
+		if( ! InstallPUH( flags,	mode_id, frequency,	pd ) )
 		{
 			rc = 20;
 		}
 		else
 		{
+			if( ! ActivatePUH( pd ) )
 			{
-				ULONG flags = 0;
-				
-				LogPUH( pd, "Using mode ID 0x%08lx, %ld Hz.", mode_id, frequency );
-				
-				switch( level )
-				{
-					case 0:
-						LogPUH( pd, "No patches." );
-
-						flags = PUHF_NONE;
-						break;
-
-					case 1:
-						LogPUH( pd, "ROM patches." );
-
-						flags = PUHF_PATCH_ROM;
-						break;
-						
-					case 2:
-						LogPUH( pd, "ROM and application patches." );
-
-						flags = PUHF_PATCH_ROM | PUHF_PATCH_APPS;
-						break;
-				}
-
-				if( ! InstallPUH( flags,	mode_id, frequency,	pd ) )
-				{
-					rc = 20;
-				}
-				else
-				{
-					if( ! ActivatePUH( pd ) )
-					{
-						rc = 20;
-					}
-					else
-					{
-						LogPUH( pd, "Waiting for CTRL-C..." );
-						Wait( SIGBREAKF_CTRL_C );
-						LogPUH( pd, "Got it." );
-				
-						DeactivatePUH( pd );
-					}
-				
-					UninstallPUH( pd );
-				}
+				rc = 20;
 			}
-
-			FreePUH( pd );
+			else
+			{
+				Wait( SIGBREAKF_CTRL_C );
+				DeactivatePUH( pd );
+			}
+				
+			UninstallPUH( pd );
 		}
+		FreePUH( pd );
 	}
 
-
 	CloseAHI();
-
 	return rc;
 }
 

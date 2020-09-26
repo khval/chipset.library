@@ -102,6 +102,9 @@ mem_api.o:		mem_api.c
 68k_stubs.o:	68k_stubs.c
 	gcc  -Wall -O3  $(INC)  -c -o 68k_stubs.o 68k_stubs.c
 
+NallePUH/src/PUH.o: NallePUH/src/PUH.c
+	gcc  -Wall -O3 $(INC)  -c -o NallePUH/src/PUH.o NallePUH/src/PUH.c
+
 
 .PHONY: clean
 clean:

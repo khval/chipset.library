@@ -19,7 +19,9 @@
      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
+
 #define __USE_INLINE__
+#define __NOLIBBASE__
 
 #include <stdint.h>
 #include <stdio.h>
@@ -27,6 +29,9 @@
 #include <stdbool.h>
 
 #include <proto/exec.h>
+
+#undef __NOLIBBASE__
+
 #include <proto/dos.h>
 
 #include <exec/execbase.h>
@@ -41,12 +46,20 @@
 
 #include <proto/ahi.h>
 #include <proto/exec.h>
+
 #include <proto/utility.h>
 #include <proto/dos.h>
 
 #include <stdio.h>
 
 #include "PUH.h"
+
+#define SIZEOF_SHORT 2
+#define SIZEOF_INT 4
+
+#include "uade/sysdeps.h"
+#include "uade/memory.h"
+
 
 #define INTF_AUDIO	 ( INTF_AUD3 | INTF_AUD2 | INTF_AUD1 | INTF_AUD0 )
 
@@ -59,19 +72,18 @@ static bool puh_RemapMemory( struct PUHData* pd );
 static BOOL
 RestoreMemory( struct PUHData* pd );
 
-static UWORD
-PUHRead( UWORD						reg,
-				 BOOL*						handled,
-				 struct PUHData*	pd,
-				 struct ExecBase* SysBase );
+static UWORD PUHRead( UWORD reg, BOOL *handled );
+static void PUHWrite( UWORD reg, UWORD value, BOOL *handled );
 
 
-static void
-PUHWrite( UWORD						reg,
-					UWORD						value,
-					BOOL*						handled,
-					struct PUHData*	pd,
-					struct ExecBase* SysBase );
+//extern xlate_func default_xlate;
+//extern check_func default_check;
+
+addrbank nallePuh_bank = {
+    nallePuh_lget, nallePuh_wget, nallePuh_bget,
+    nallePuh_lput, nallePuh_wput, nallePuh_bput,
+    default_xlate, default_check
+};
 
 
  SAVEDS static void
@@ -133,8 +145,7 @@ ULONG DataFaultHandler(struct ExceptionContext *pContext, struct ExecBase *pSysB
 
 STATIC UBYTE CustomData[512];
 
-UWORD
-ReadWord( void* address )
+UWORD ReadWord( void* address )
 {
 	ULONG offset = (ULONG)address & 0x1ff;
 
@@ -142,8 +153,7 @@ ReadWord( void* address )
 }
 
 
-void
-WriteWord( void* address, UWORD value )
+void WriteWord( void* address, UWORD value )
 {
 	ULONG offset = (ULONG)address & 0x1ff;
 
@@ -151,8 +161,7 @@ WriteWord( void* address, UWORD value )
 }
 
 
-ULONG
-ReadLong( void* address )
+ULONG ReadLong( void* address )
 {
 	ULONG offset = (ULONG)address & 0x1ff;
 
@@ -160,8 +169,7 @@ ReadLong( void* address )
 }
 
 
-void
-WriteLong( void* address, ULONG value )
+void WriteLong( void* address, ULONG value )
 {
 	ULONG offset = (ULONG)address & 0x1ff;
 
@@ -174,10 +182,12 @@ WriteLong( void* address, ULONG value )
 ** Initialize PUH *************************************************************
 ******************************************************************************/
 
+	struct PUHData* pd			= NULL;
+
 struct PUHData*
 AllocPUH( void )
 {
-	struct PUHData* pd			= NULL;
+
 	struct GfxBase* gfxbase = NULL;
 
 	if( AHIBase == NULL )
@@ -476,7 +486,6 @@ static BOOL RestoreMemory( struct PUHData* pd )
 
 ULONG DataFaultHandler(struct ExceptionContext *pContext, struct ExecBase *pSysBase, struct PUHData *pd)
 {
-	struct ExecIFace *IExec = (struct ExecIFace *)pSysBase->MainInterface;
 	BOOL bHandled = FALSE;
 	APTR pFaultInst, pFaultAddress;
 
@@ -527,7 +536,7 @@ ULONG DataFaultHandler(struct ExceptionContext *pContext, struct ExecBase *pSysB
 			case 42: /* lha */
 				eff_addr =(a_reg==0?0:pContext->gpr[a_reg]) + offset;
 
-				pContext->gpr[d_reg] = (int32)PUHRead((eff_addr & 0x1ff),&bHandled,pd,pSysBase);
+				pContext->gpr[d_reg] = (int32)PUHRead((eff_addr & 0x1ff), &bHandled );
 
 	 			if (pContext->gpr[d_reg] & 0x8000) /* signed? */
 					pContext->gpr[d_reg] |= 0xFFFF0000;
@@ -538,8 +547,7 @@ ULONG DataFaultHandler(struct ExceptionContext *pContext, struct ExecBase *pSysB
 			case 32: /* lwz */
 				eff_addr = (a_reg==0?0:pContext->gpr[a_reg]) + offset;
 
-				pContext->gpr[d_reg] = (uint32)(PUHRead((eff_addr & 0x1ff),&bHandled,pd,pSysBase) << 16) |
-												(uint32)PUHRead((eff_addr & 0x1ff) + 2,&bHandled,pd,pSysBase);
+				pContext->gpr[d_reg] = (uint32)(PUHRead((eff_addr & 0x1ff), &bHandled) << 16) |	(uint32)PUHRead((eff_addr & 0x1ff) + 2, &bHandled);
 
 				DEBUG( "lwz %lx, %lx\n", eff_addr, pContext->gpr[d_reg] );
 			break;
@@ -547,7 +555,7 @@ ULONG DataFaultHandler(struct ExceptionContext *pContext, struct ExecBase *pSysB
 			case 40: /* lhz */
 				eff_addr = (a_reg==0?0:pContext->gpr[a_reg]) + offset;
 
-				pContext->gpr[d_reg] = (int32)PUHRead((eff_addr & 0x1ff),&bHandled,pd,pSysBase);
+				pContext->gpr[d_reg] = (int32)PUHRead((eff_addr & 0x1ff), &bHandled);
 
 				DEBUG( "lhz %lx, %lx\n", eff_addr, pContext->gpr[d_reg] );
 			break;
@@ -558,7 +566,7 @@ ULONG DataFaultHandler(struct ExceptionContext *pContext, struct ExecBase *pSysB
 
 				DEBUG( "sth r%ld,%ld(r%ld) (ea: %lx	data: %lx)\n", d_reg, offset, a_reg, eff_addr, value );
 
-				PUHWrite((eff_addr & 0x1ff),value,&bHandled,pd,pSysBase);
+				PUHWrite((eff_addr & 0x1ff),value, &bHandled);
 			break;
 
 			case 36: /* stw */
@@ -567,8 +575,8 @@ ULONG DataFaultHandler(struct ExceptionContext *pContext, struct ExecBase *pSysB
 
 				DEBUG( "stw r%ld,%ld(r%ld) (ea: %lx	data: %lx)\n", d_reg, offset, a_reg, eff_addr, value );
 
-				PUHWrite((eff_addr & 0x1ff),value>>16,&bHandled,pd,pSysBase);
-				PUHWrite((eff_addr & 0x1ff)+2,value&0xffff,&bHandled,pd,pSysBase);
+				PUHWrite((eff_addr & 0x1ff),value>>16, &bHandled);
+				PUHWrite((eff_addr & 0x1ff)+2,value&0xffff, &bHandled);
 			break;
 
 			case 31:
@@ -580,7 +588,7 @@ ULONG DataFaultHandler(struct ExceptionContext *pContext, struct ExecBase *pSysB
 
 						DEBUG( "sthx r%ld, r%ld, r%ld (ea: %lx	data: %lx)\n", d_reg, a_reg, b_reg, eff_addr, value );
 
-						PUHWrite((eff_addr & 0x1ff),value,&bHandled,pd,pSysBase);
+						PUHWrite((eff_addr & 0x1ff),value, &bHandled);
 					break;
 
 					case 151: /* stwx */
@@ -589,14 +597,14 @@ ULONG DataFaultHandler(struct ExceptionContext *pContext, struct ExecBase *pSysB
 
 						DEBUG( "stwx r%ld, r%ld, r%ld (ea: %lx	data: %lx)\n", d_reg, a_reg, b_reg, eff_addr, value );
 
-						PUHWrite((eff_addr & 0x1ff),value>>16,&bHandled,pd,pSysBase);
-						PUHWrite((eff_addr & 0x1ff)+2,value&0xffff,&bHandled,pd,pSysBase);
+						PUHWrite((eff_addr & 0x1ff),value>>16, &bHandled);
+						PUHWrite((eff_addr & 0x1ff)+2,value&0xffff, &bHandled);
 					break;
 
 					case 343: /* lhax */
 						eff_addr = (a_reg==0?pContext->gpr[a_reg]:0) + pContext->gpr[b_reg];
 
-						pContext->gpr[d_reg] = (int32)PUHRead((eff_addr & 0x1ff),&bHandled,pd,pSysBase);
+						pContext->gpr[d_reg] = (int32)PUHRead((eff_addr & 0x1ff), &bHandled);
 
 						if (pContext->gpr[d_reg] & 0x8000) /* signed? */
 							pContext->gpr[d_reg] |= 0xFFFF0000;
@@ -639,11 +647,7 @@ ULONG DataFaultHandler(struct ExceptionContext *pContext, struct ExecBase *pSysB
 ** Handle reads ***************************************************************
 ******************************************************************************/
 
-static UWORD
-PUHRead( UWORD						reg,
-				 BOOL*						handled,
-				 struct PUHData*	pd,
-				 struct ExecBase* SysBase )
+static UWORD PUHRead( UWORD reg, BOOL *handled )
 {
 	UWORD	result;
 	UWORD* address = (UWORD*) ( (ULONG) pd->m_CustomDirect + reg );
@@ -689,12 +693,7 @@ PUHRead( UWORD						reg,
 ** Handle writes **************************************************************
 ******************************************************************************/
 	
-static void
-PUHWrite( UWORD						reg,
-					UWORD						value,
-					BOOL*						handled,
-					struct PUHData*	pd,
-					struct ExecBase* SysBase )
+static void PUHWrite( UWORD	reg, UWORD value, BOOL*handled )
 {
 	UWORD* address = (UWORD*) ( (ULONG) pd->m_CustomDirect + reg );
 
@@ -1197,8 +1196,7 @@ STATIC ULONG CallInt(UWORD irq, UWORD mask, struct ExceptionContext *pContext, s
 	return result;
 }
 
-SAVEDS static void
-PUHSoftInt(struct ExceptionContext *pContext, struct ExecBase *pSysBase, struct PUHData *pd)
+SAVEDS static void PUHSoftInt(struct ExceptionContext *pContext, struct ExecBase *pSysBase, struct PUHData *pd)
 {
 	UWORD	 mask;
 
@@ -1231,8 +1229,7 @@ PUHSoftInt(struct ExceptionContext *pContext, struct ExecBase *pSysBase, struct 
 	while (mask != 0);
 }
 
-SAVEDS static void
-PUHSoundFunc( REG( a0, struct Hook*						hook ),
+SAVEDS static void PUHSoundFunc( REG( a0, struct Hook*						hook ),
 							REG( a2, struct AHIAudioCtrl*		actrl ),
 							REG( a1, struct AHISoundMessage* msg ) )
 {

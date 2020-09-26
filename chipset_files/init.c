@@ -77,6 +77,12 @@ int32 _start(void)
 
 extern void cia_process_fn ();
 
+extern BOOL OpenAHI( void );
+extern void CloseAHI( void );
+
+extern BOOL init_nallepuh(  	ULONG mode_id,ULONG frequency );
+extern void cleanup_nallepuh();
+
 #define __debug_cia__
 
 void __init_cia_process__()
@@ -155,6 +161,10 @@ void close_libs()
 		cia_mx = NULL;
 	}
 
+	cleanup_nallepuh();
+
+	CloseAHI();
+
 	close_lib( UtilityBase, IUtility );
 	close_lib( DOSBase, IDOS);
 	close_lib( NewLibBase, INewlib);
@@ -211,6 +221,11 @@ BOOL init()
 	if ( ! open_lib( "dos.library", 53L , "main", 1, &DOSBase, (struct Interface **) &IDOS  ) ) return FALSE;
 	if ( ! open_lib( "newlib.library", 53L , "main", 1, &NewLibBase, (struct Interface **) &INewlib  ) ) return FALSE;
 	if ( ! open_lib( "utility.library", 53L , "main", 1, &UtilityBase, (struct Interface **) &IUtility  ) ) return FALSE;
+	if ( ! OpenAHI() ) return FALSE;
+
+	// AHI mode ID, check AHI prefs, need to improve this part.
+
+	if ( ! init_nallepuh( 0x3E0007,48000 ) ) return FALSE;
 
 	cia_mx = (APTR) IExec -> AllocSysObjectTags(ASOT_MUTEX, TAG_DONE);
 	if ( ! cia_mx) return FALSE;

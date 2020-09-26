@@ -57,90 +57,53 @@
 extern UBYTE pooh11_sb[];
 extern ULONG pooh11_sblen;
 
-static BOOL
-OpenAHI( void );
-
-static void
-CloseAHI( void );
+BOOL OpenAHI( void );
+void CloseAHI( void );
 
 
 /******************************************************************************
 ** Global variables ***********************************************************
 ******************************************************************************/
 
-static struct MsgPort*	AHImp		 = NULL;
-static struct AHIRequest*	 AHIio		 = NULL;
-static BYTE			 AHIDevice = IOERR_OPENFAIL;
-struct Device*			 AHIBase	 = NULL;
-
+static struct MsgPort		*AHImp		= NULL;
+static struct AHIRequest	*AHIio		= NULL;
+static BYTE			AHIDeviceError	= IOERR_OPENFAIL;
+struct Device			*AHIBase		= NULL;
+struct PUHData			*pd			= NULL;
 
 #ifdef __amigaos4__
 struct AHIIFace *		 	IAHI;
 #endif
 
 /******************************************************************************
-** Disable ctrl-c *************************************************************
-******************************************************************************/
-
-void __chkabort( void )
-{
-	// Disable automatic ctrl-c handling
-}
-
-
-
-/******************************************************************************
 ** main ***********************************************************************
 ******************************************************************************/
 
-		struct PUHData* pd = NULL;
-
-int nallepuh_main(  	ULONG mode_id,ULONG frequency )
+BOOL init_nallepuh(  	ULONG mode_id,ULONG frequency )
 {
-	int	 rc				= 0;
-
-	if( ! OpenAHI() )
-	{
-		Printf( "Unable to open ahi.device version 4.\n" );
-		rc = 20;
-	}
-
 	pd = AllocPUH();
-		
-	if( pd == NULL )
+	if (pd == NULL) return FALSE;
+			
+	if( InstallPUH( PUHF_NONE, mode_id, frequency, pd ) )
 	{
-		rc = 20;
-	}
-	else
-	{
-		ULONG flags = 0;
-				
-		flags = PUHF_NONE;
-
-		if( ! InstallPUH( flags,	mode_id, frequency,	pd ) )
-		{
-			rc = 20;
-		}
-		else
-		{
-			if( ! ActivatePUH( pd ) )
-			{
-				rc = 20;
-			}
-			else
-			{
-				Wait( SIGBREAKF_CTRL_C );
-				DeactivatePUH( pd );
-			}
-				
-			UninstallPUH( pd );
-		}
-		FreePUH( pd );
+		if( ActivatePUH( pd ) ) return TRUE;
 	}
 
-	CloseAHI();
-	return rc;
+	return FALSE;
 }
+
+void cleanup_nallepuh()
+{
+	if (pd)
+	{
+		DeactivatePUH( pd );
+		UninstallPUH( pd );
+
+		FreePUH( pd );
+		pd = NULL;
+	}
+}
+
 
 /******************************************************************************
 ** OpenAHI ********************************************************************
@@ -148,23 +111,22 @@ int nallepuh_main(  	ULONG mode_id,ULONG frequency )
 
 /* Opens and initializes the device. */
 
-static BOOL OpenAHI( void )
+BOOL OpenAHI( void )
 {
 	BOOL rc = FALSE;
 
-	AHImp = CreateMsgPort();
+	AHImp = (struct MsgPort *) AllocSysObjectTags(ASOT_PORT, TAG_DONE);
 
 	if( AHImp != NULL )
 	{
-		AHIio = (struct AHIRequest*) CreateIORequest( AHImp, 
-																									sizeof( struct AHIRequest ) );
+		AHIio = (struct AHIRequest*) CreateIORequest( AHImp, sizeof( struct AHIRequest ) );
 
 		if( AHIio != NULL ) 
 		{
 			AHIio->ahir_Version = 4;
-			AHIDevice = OpenDevice( AHINAME, AHI_NO_UNIT, (struct IORequest*) AHIio, 0UL );
+			AHIDeviceError = OpenDevice( AHINAME, AHI_NO_UNIT, (struct IORequest*) AHIio, 0UL );
 
-			if( AHIDevice == 0 )
+			if( AHIDeviceError == 0 )
 			{
 				AHIBase = (struct Library*) AHIio->ahir_Std.io_Device;
 				GETIFACE(AHI);
@@ -183,21 +145,29 @@ static BOOL OpenAHI( void )
 
 /* Closes the device, cleans up. */
 
-static void CloseAHI( void )
+void CloseAHI( void )
 {
-	if( AHIDevice == 0 )
+	if (AHIio)
 	{
-		 DROPIFACE(AHI);
-		CloseDevice( (struct IORequest*) AHIio );
+		if( AHIDeviceError == 0 )
+		{
+			DROPIFACE(AHI);
+			CloseDevice( (struct IORequest*) AHIio );
+		}
+
+		DeleteIORequest( (struct IORequest*) AHIio );
+		AHIio	 = NULL;
 	}
 
-	DeleteIORequest( (struct IORequest*) AHIio );
-	DeleteMsgPort( AHImp );
+	if (AHImp)
+	{
+		FreeSysObject( ASOT_PORT, AHImp );
+		AHImp = NULL;
+	}
 
-	AHIBase	 = NULL;
-	AHImp		 = NULL;
-	AHIio		 = NULL;
-	AHIDevice = IOERR_OPENFAIL;
+	AHIBase = NULL;
+
+	AHIDeviceError = IOERR_OPENFAIL;
 }
 
 

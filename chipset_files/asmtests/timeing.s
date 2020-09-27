@@ -37,19 +37,24 @@
 
 	move.l #$BFE001,A4
 
-openLib	macro 
-	lea \1,A1
+OPENLIB	macro 
+	lea \1Name,A1
 	move.l 4.w,a6
 	moveq #0,d0
 	jsr _LVOOpenLibrary(a6)
-	move.l d0,\2
+	move.l d0,\1Base
 	tst.l	d0
 	beq	closeLibs
 	endm
 
+CLOSELIB	macro
+	move.l \1Base(pc),a1
+	jsr	closeLib
+	endm
+
 main:
-	openLib	dosName, dosBase
-	openLib	chipsetName,chipsetBase
+	OPENLIB	dos
+	OPENLIB	chipset
 
 	lea	txtLibsOpen(pc),a1
 	jsr	_writeText
@@ -57,10 +62,8 @@ main:
 	jsr ciatest
 
 closeLibs:
-	move.l dosBase(pc),a1
-	jsr	closeLib
-	move.l chipsetBase(pc),a1
-	jsr	closeLib
+	CLOSELIB	chipset
+	CLOSELIB	dos
 	rts
 
 ciatest
@@ -79,16 +82,12 @@ ciatest
         and.b   #%11000000,d0           ;Don't trash bits we are not
         or.b    #%00001000,d0           ;using...
 
-	lea	txtReadByteOk(pc),a1
-	jsr	_writeText
-
 ;        move.b  d0,ciacra(a4)
+
 	chipWriteByte d0,ciacra,a4
 
-	lea	txtWriteByteOk(pc),a1
-	jsr	_writeText
-
 ;        move.b  #%01111111,ciaicr(a4)   ;Clear all 8520 interrupts
+
 	chipWriteByte #%01111111,ciaicr,a4
 
 ;
@@ -114,7 +113,7 @@ busy_wait:
 
 	chipReadByte ciaicr,a4,d0
 	and.b	#1,d0
-	cmp.b	#1,d0
+	tst.b		d0
 
 	beq.s   busy_wait
 

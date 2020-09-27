@@ -5,20 +5,29 @@
 
 	SECTION main,CODE
 
-openLib	macro 
-	lea \1,A1
+OPENLIB	macro 
+	lea \1Name,A1
 	move.l 4.w,a6
 	moveq #0,d0
 	jsr _LVOOpenLibrary(a6)
-	move.l d0,\2
+	move.l d0,\1Base
 	tst.l	d0
 	beq	closeLibs
 	endm
 
-closeLib	macro
-		lea 1\(pc),a1
-		jsr _closeLib
-		endm
+CLOSELIB	macro
+	move.l \1Base(pc),a1
+	jsr	closeLib
+	endm
+
+INFOTXT	macro
+	move.l	#PRINT_FMT,D1	; FMT
+	move.l	#printf_args,A1	; ARGS
+	move.l	#txt\1,(A1)
+	move.l	A1,D2			; D2
+	move.l	dosBase,a6		; DosBase
+	jsr		_LVOVPrintf(a6)	; Printf
+	endm
 
 writeText	macro
 		lea 1\(pc),a1
@@ -26,20 +35,17 @@ writeText	macro
 		endm
 
 main:
-	openLib	dosName, dosBase
-	openLib	chipsetName, chipsetBase
+	OPENLIB	dos
+	OPENLIB	chipset
 
-	lea	txtLibsOpen(pc),a1
-	jsr	_writeText
+	INFOTXT LibsOpen
 
 	move.l #30,d1
 	jsr delay
 
 closeLibs:
-	move.l dosBase(pc),a1
-	jsr	closeLib
-	move.l chipsetBase(pc),a1
-	jsr	closeLib
+	CLOSELIB	chipset
+	CLOSELIB	dos
 	rts
 
 closeLib
@@ -71,8 +77,10 @@ dosBase:
 chipsetBase
 	dc.l 0
 
+printf_args:
+		ds.l	20
+
 txtLibsOpen:
-	dc.l	14
 	dc.b "Libs are open",$A,0
 
 dosName:
@@ -80,5 +88,8 @@ dosName:
 
 chipsetName:
 	dc.b	"chipset.library",0
+
+PRINT_FMT
+		dc.b	"%s",10,0
 
 

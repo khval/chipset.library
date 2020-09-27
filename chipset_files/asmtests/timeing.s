@@ -52,6 +52,46 @@ CLOSELIB	macro
 	jsr	closeLib
 	endm
 
+INFOTXT	macro
+	move.l	D0,-(SP)
+	move.l	D1,-(SP)
+	move.l	D2,-(SP)
+	move.l	A1,-(SP)
+	move.l	#PRINT_TXT_FMT,D1	; FMT
+	move.l	#printf_args,A1	; ARGS
+	move.l	#txt\1,(A1)
+	move.l	A1,D2			; D2
+	move.l	dosBase,a6		; DosBase
+	jsr		_LVOVPrintf(a6)	; Printf
+	move.l	(SP)+,A1
+	move.l	(SP)+,D2
+	move.l	(SP)+,D1
+	move.l	(SP)+,D0
+	endm
+
+INFOVALUE	macro
+	move.l	D0,-(SP)
+	move.l	#printf_args,A1	; ARGS
+	move.l	\1,(A1)
+	move.l	D1,-(SP)
+	move.l	D2,-(SP)
+	move.l	A1,-(SP)
+	move.l	#PRINT_VALUE_FMT,D1	; FMT
+	move.l	#printf_args,D2		; ARG ARRAY
+	move.l	dosBase,a6		; DosBase
+	jsr		_LVOVPrintf(a6)	; Printf
+	move.l	(SP)+,A1
+	move.l	(SP)+,D2
+	move.l	(SP)+,D1
+	move.l	(SP)+,D0
+	endm
+
+DELAY	macro
+	move.l #\1,d1
+	move.l dosBase(pc),a6
+	jsr _LVODelay(a6)
+	endm
+
 main:
 	OPENLIB	dos
 	OPENLIB	chipset
@@ -107,51 +147,81 @@ TIME    equ     2148
 ;
 ;----Wait for the timer to count down
 
-
-busy_wait:
-;        btst.b  #0,ciaicr(a4)           ;Wait for timer expired flag
-
-	chipReadByte ciaicr,a4,d0
-	and.b	#1,d0
-	tst.b		d0
-
-	beq.s   busy_wait
-
-	lea	txtBlinkLed(pc),a1
-	jsr	_writeText
-
-;        bchg.b  #CIAB_LED,ciapra(a4)    ;Blink light
-
-	move.l	#CIAB_LED,d1
-	move.l	A4,A0
-	add.l		#ciapra,A0
-	LINKLIB	_LVOBitChgChipByte,chipsetBase
-
-;        bset.b  #0,ciacra(a4)           ;Restart timer
-
 	move.l	#0,d1
 	move.l	A4,A0
 	add.l		#ciapra,A0
 	LINKLIB	_LVOBitSetChipByte,chipsetBase
 
-	bra.s   busy_wait
 
+busy_wait:
+	move.l	#0,A1
+	LINKLIB	_LVOReadChipByte,chipsetBase
+	tst.b	D0
+	bne.s	.exit		; if something is set in ChipRam then quit...
+
+;-------------------------------------------------------------------------------
+;        btst.b  #0,ciaicr(a4)           ;Wait for timer expired flag
+;---------------------------------------------------------------------------------
+
+	chipReadByte ciaicr,a4,d0
+
+	INFOVALUE d0
+
+	and.b	#1,d0
+
+	INFOVALUE d0
+
+	DELAY 20
+	tst.b		d0
+
+;-------------------------------------------------------------------------------
+	beq.s   busy_wait
+;-------------------------------------------------------------------------------
+
+	lea	txtBlinkLed(pc),a1
+	jsr	_writeText
+
+;-------------------------------------------------------------------------------
+;        bchg.b  #CIAB_LED,ciapra(a4)    ;Blink light
+;-------------------------------------------------------------------------------
+
+	move.l	#CIAB_LED,d1
+	move.l	A4,A0
+	add.l		#ciapra,A0
+;	LINKLIB	_LVOBitChgChipByte,chipsetBase
+
+;-------------------------------------------------------------------------------
+;        bset.b  #0,ciacra(a4)           ;Restart timer
+;-------------------------------------------------------------------------------
+
+	move.l	#0,d1
+	move.l	A4,A0
+	add.l		#ciapra,A0
+;	LINKLIB	_LVOBitSetChipByte,chipsetBase
+
+;-------------------------------------------------------------------------------
+	bra.s   busy_wait
+;-------------------------------------------------------------------------------
+
+.exit
+	INFOTXT	quit
+	INFOVALUE d0
 	rts
 
 closeLib
-	move.l a1,d0
+	move.l	a1,d0
 	tst.l d0
 	beq.s	.notOpen
-	move.l 4,a6
-	jsr	_LVOCloseLibrary(a6)
-	moveq #0,d0
+	move.l	4,a6
+	jsr		_LVOCloseLibrary(a6)
+	moveq	#0,d0
 .notOpen
 	rts
 
 _writeText:
-	move.l (a1),d2
-	add.l #4,a1
-	move.l a1,d1
+	move.l	(a1),d2
+	add.l		#4,a1
+	move.l	a1,d1
 	move.l	dosBase(pc),A6
 	jsr		_LVOWriteChars(a6)
 	rts
@@ -161,6 +231,12 @@ dosBase:
 
 chipsetBase
 	dc.l 0
+
+printf_args:
+	ds.l	20
+
+txtquit:
+	dc.b "quit",$A,0
 
 txtLibsOpen:
 	dc.l	14
@@ -187,4 +263,10 @@ dosName:
 
 chipsetName:
 	dc.b	"chipset.library",0
+
+PRINT_TXT_FMT
+		dc.b	"TEXT: %s",10,0
+
+PRINT_VALUE_FMT
+		dc.b	"VALUE: %ld",10,0
 

@@ -26,6 +26,8 @@
 
 #include <stdarg.h>
 
+#define LIBNAME "chipset.library"
+
 /* Version Tag */
 #include "chipset.library_rev.h"
 STATIC CONST UBYTE USED verstag[] = VERSTAG;
@@ -46,6 +48,8 @@ struct UtilityIFace *IUtility = NULL;
 struct Library *NewLibBase = NULL;
 struct Library *DOSBase = NULL;
 struct Library *UtilityBase = NULL;
+
+extern struct AHIIFace *IAHI;
 
 struct Task *main_task = NULL;	// main_task is whatever when running from a library
 struct Process *cia_process = NULL;
@@ -155,11 +159,14 @@ void close_libs()
 
 	struct ExecIFace *IExec = (struct ExecIFace *)(*(struct ExecBase **)4)->MainInterface;
 
+	if ( ! IAHI ) IDOS->Printf("%s: Failed to open AHI\n",LIBNAME); 
+
 	if (cia_mx) 
 	{
 		IExec -> FreeSysObject(ASOT_MUTEX, cia_mx); 
 		cia_mx = NULL;
 	}
+	else if (IDOS) IDOS->Printf("%s: Failed to create Mutex\n",LIBNAME);
 
 	cleanup_nallepuh();
 
@@ -273,7 +280,7 @@ STATIC struct Library *libInit(struct Library *LibraryBase, APTR seglist, struct
 
 	libBase->libNode.lib_Node.ln_Type = NT_LIBRARY;
 	libBase->libNode.lib_Node.ln_Pri  = 0;
-	libBase->libNode.lib_Node.ln_Name = "chipset.library";
+	libBase->libNode.lib_Node.ln_Name = LIBNAME;
 	libBase->libNode.lib_Flags        = LIBF_SUMUSED|LIBF_CHANGED;
 	libBase->libNode.lib_Version      = VERSION;
 	libBase->libNode.lib_Revision     = REVISION;

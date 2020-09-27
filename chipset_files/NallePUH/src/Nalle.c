@@ -82,12 +82,19 @@ struct AHIIFace *		 	IAHI;
 BOOL init_nallepuh(  	ULONG mode_id,ULONG frequency )
 {
 	pd = AllocPUH();
-	if (pd == NULL) return FALSE;
-			
-	if( InstallPUH( PUHF_NONE, mode_id, frequency, pd ) )
+	if (pd) 
 	{
-		if( ActivatePUH( pd ) ) return TRUE;
+		if( InstallPUH( PUHF_NONE, mode_id, frequency, pd ) )
+		{
+			if( ActivatePUH( pd ) )
+			{
+				 return TRUE;
+			}
+			else printf("Can't activate PUH\n");
+		}
+		else	printf("Can't InstallPUH\n");
 	}
+	else printf("Can't allocate puh\n");
 
 	return FALSE;
 }
@@ -113,8 +120,6 @@ void cleanup_nallepuh()
 
 BOOL OpenAHI( void )
 {
-	BOOL rc = FALSE;
-
 	AHImp = (struct MsgPort *) AllocSysObjectTags(ASOT_PORT, TAG_DONE);
 
 	if( AHImp != NULL )
@@ -130,12 +135,12 @@ BOOL OpenAHI( void )
 			{
 				AHIBase = (struct Library*) AHIio->ahir_Std.io_Device;
 				GETIFACE(AHI);
-				rc = TRUE;
+				return TRUE;
 			}
 		}
 	}
 
-	return rc;
+	return FALSE;
 }
 
 

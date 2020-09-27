@@ -29,6 +29,20 @@ INFOTXT	macro
 	jsr		_LVOVPrintf(a6)	; Printf
 	endm
 
+INFOVALUE	macro
+	move.l	#printf_args,A1	; ARGS
+	move.l	\1,(A1)
+	move.l	#PRINT_VALUE_FMT,D1	; FMT
+	move.l	#printf_args,D2		; ARG ARRAY
+	move.l	dosBase,a6		; DosBase
+	jsr		_LVOVPrintf(a6)	; Printf
+	endm
+
+DELAY	macro
+	move.l #\1,d1
+	jsr delay
+	endm
+
 writeText	macro
 		lea 1\(pc),a1
 		jsr _writeText
@@ -40,8 +54,8 @@ main:
 
 	INFOTXT LibsOpen
 
-	move.l #30,d1
-	jsr delay
+	INFOVALUE D0
+	DELAY 30
 
 closeLibs:
 	CLOSELIB	chipset
@@ -92,4 +106,6 @@ chipsetName:
 PRINT_FMT
 		dc.b	"%s",10,0
 
+PRINT_VALUE_FMT
+		dc.b	"VALUE: %ld",10,0
 

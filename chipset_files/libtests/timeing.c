@@ -117,12 +117,13 @@ TIME    equ     2148
 
 	for (;;)        // busy wait
 	{
+		if (readChipByte(0x00000000) == 0xFF) break;
 		icr = readChipByte(&(_ciaa ->ciaicr));
 		if ((1&icr)==0) continue;                        // Wait for timer expired flag
 
-		bitChgChipByte(&(_ciaa ->ciacra),CIAB_LED);     // blink light
+		bitChgChipByte(&(_ciaa ->ciapra),CIAB_LED);     // blink light
 		bitSetChipByte(&(_ciaa ->ciacra),0);             // Restart timer
-		if (readChipByte(0x00000000) == 0xFF) break;
+
         }
 
 /*

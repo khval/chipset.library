@@ -119,8 +119,8 @@ ciatest
 ;        move.b  ciacra(a4),d0           ;Set control register A on CIAA
 	chipReadByte ciacra,a4,d0
 
-        and.b   #%11000000,d0           ;Don't trash bits we are not
-        or.b    #%00001000,d0           ;using...
+	and.b   #%11000000,d0           ;Don't trash bits we are not
+	or.b    #%00001000,d0           ;using...
 
 ;        move.b  d0,ciacra(a4)
 
@@ -154,7 +154,7 @@ TIME    equ     2148
 
 
 busy_wait:
-	move.l	#0,A1
+	move.l	#0,A0
 	LINKLIB	_LVOReadChipByte,chipsetBase
 	tst.b	D0
 	bne.s	.exit		; if something is set in ChipRam then quit...
@@ -188,7 +188,7 @@ busy_wait:
 	move.l	#CIAB_LED,d1
 	move.l	A4,A0
 	add.l		#ciapra,A0
-;	LINKLIB	_LVOBitChgChipByte,chipsetBase
+	LINKLIB	_LVOBitChgChipByte,chipsetBase
 
 ;-------------------------------------------------------------------------------
 ;        bset.b  #0,ciacra(a4)           ;Restart timer
@@ -196,7 +196,7 @@ busy_wait:
 
 	move.l	#0,d1
 	move.l	A4,A0
-	add.l		#ciapra,A0
+	add.l		#ciacra,A0
 ;	LINKLIB	_LVOBitSetChipByte,chipsetBase
 
 ;-------------------------------------------------------------------------------

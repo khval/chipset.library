@@ -124,13 +124,18 @@ ciatest
 ;----Setup, only do once
 ;----This sets all bits needed for timer A one-shot mode.
 
+;-------------------------------------------------------------------------------
 ;        move.b  ciacra(a4),d0           ;Set control register A on CIAA
+;-------------------------------------------------------------------------------
+
 	chipReadByte ciacra,a4,d0
 
 	and.b   #%11000000,d0           ;Don't trash bits we are not
 	or.b    #%00001000,d0           ;using...
 
+;-------------------------------------------------------------------------------
 ;        move.b  d0,ciacra(a4)
+;-------------------------------------------------------------------------------
 
 	chipWriteByte d0,ciacra,a4
 
@@ -173,16 +178,9 @@ busy_wait:
 
 	chipReadByte ciaicr,a4,d0
 
-	INFOVALUE d0
-
-	and.b	#1,d0
-
-	INFOVALUE d0
-
-	DELAY 20
-	tst.b		d0
-
 ;-------------------------------------------------------------------------------
+	and.b	#1,d0
+	tst.b		d0
 	beq.s   busy_wait
 ;-------------------------------------------------------------------------------
 
@@ -193,19 +191,13 @@ busy_wait:
 ;        bchg.b  #CIAB_LED,ciapra(a4)    ;Blink light
 ;-------------------------------------------------------------------------------
 
-	move.l	#CIAB_LED,d1
-	move.l	A4,A0
-	add.l		#ciapra,A0
-	LINKLIB	_LVOBitChgChipByte,chipsetBase
+	chipChgBit #CIAB_LED,ciapra,a4
 
 ;-------------------------------------------------------------------------------
 ;        bset.b  #0,ciacra(a4)           ;Restart timer
 ;-------------------------------------------------------------------------------
 
-	move.l	#0,d1
-	move.l	A4,A0
-	add.l		#ciacra,A0
-	LINKLIB	_LVOBitSetChipByte,chipsetBase
+	chipSetBit #0,ciacra,a4
 
 ;-------------------------------------------------------------------------------
 	bra.s   busy_wait

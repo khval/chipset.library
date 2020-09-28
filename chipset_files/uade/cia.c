@@ -294,8 +294,7 @@ ULONG _spyCIAA(unsigned int addr)
 
     switch(addr & 0xf) {
      case 0:				// pra
-	tmp = 0;
-	return tmp;
+	return ciaapra;
      case 1:				// prb
 	return ciaaprb;
      case 2:				// ddra
@@ -343,15 +342,7 @@ static uae_u8 ReadCIAA(unsigned int addr)
 
     switch(addr & 0xf) {
      case 0:				// pra
-	tmp = 0;
-#if 0
-	if ((JSEM_ISMOUSE (0, &currprefs))
-	    || (!JSEM_ISMOUSE (0, &currprefs) && !(joy0button & 1)))
-	    tmp |= 0x40;
-	if (!(joy1button & 1))
-	    tmp |= 0x80;
-#endif
-	return tmp;
+	return ciaapra;
      case 1:				// prb
 	return ciaaprb;
      case 2:				// ddra

@@ -163,3 +163,26 @@ chipWriteByte		macro
 	move.l	(sp)+,a0
 	endm
 
+chipChgBit	macro
+	move.l	a0,-(sp)
+	move.l	d1,-(sp)
+	move.l	\1,d1
+	move.l	\3,A0
+	add.l		#\2,A0
+	LINKLIB	_LVOBitChgChipByte,chipsetBase
+	move.l	(sp)+,d1
+	move.l	(sp)+,a0
+	endm
+
+chipSetBit		macro 
+	move.l	a0,-(sp)
+	move.l	d1,-(sp)
+	move.l	\1,d1
+	move.l	\3,A0
+	add.l		#\2,A0
+	LINKLIB	_LVOBitChgChipByte,chipsetBase
+	move.l	(sp)+,d1
+	move.l	(sp)+,a0
+	endm
+
+

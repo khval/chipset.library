@@ -92,6 +92,13 @@ DELAY	macro
 	jsr _LVODelay(a6)
 	endm
 
+GETCHAR	macro
+	move.l dosBase(pc),a6
+	jsr	_LVOInput(a6)
+	move.l	d0,d1
+	jsr	_LVOFGetC(a6)
+	endm
+
 main:
 	OPENLIB	dos
 	OPENLIB	chipset
@@ -99,6 +106,7 @@ main:
 	lea	txtLibsOpen(pc),a1
 	jsr	_writeText
 
+	GETCHAR
 	jsr ciatest
 
 closeLibs:
@@ -197,7 +205,7 @@ busy_wait:
 	move.l	#0,d1
 	move.l	A4,A0
 	add.l		#ciacra,A0
-;	LINKLIB	_LVOBitSetChipByte,chipsetBase
+	LINKLIB	_LVOBitSetChipByte,chipsetBase
 
 ;-------------------------------------------------------------------------------
 	bra.s   busy_wait
@@ -234,6 +242,12 @@ chipsetBase
 
 printf_args:
 	ds.l	20
+
+txtbusy:
+	dc.b "busy loop start",$A,0
+
+txtcheck:
+	dc.b "check",$A,0
 
 txtquit:
 	dc.b "quit",$A,0

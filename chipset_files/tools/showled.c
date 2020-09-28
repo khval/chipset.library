@@ -106,7 +106,7 @@ struct CIA *_ciaa = 0xbfe001;
 
 int main()
 {
-	ULONG ciacra;
+	ULONG ciapra;
 
 	if (init() == FALSE)
 	{
@@ -124,9 +124,9 @@ int main()
 	{
 		events();
 
-		ciacra = spyCIAA(&(_ciaa ->ciacra));
+		ciapra = spyCIAA(&(_ciaa ->ciapra));
 
-		powerLed = ciacra & (1<<CIAB_LED) ? true : false;
+		powerLed = ciapra & (1<<CIAB_LED) ? true : false;
 
 		draw_leds();
 		Delay(1);

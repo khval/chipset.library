@@ -22,10 +22,11 @@ struct Library *GraphicsBase = NULL;
 
 struct CIA *_ciaa = 0xbfe001;
 
-int main()
+int main( int args, char *arg[] )
 {
-        uint32_t d0;
-        uint32_t a4 = _ciaa;
+//	uint32_t d0;
+//	uint32_t a4 = _ciaa;
+	uint32_t quit = 0xFF;
 
         if (init()==FALSE) 
         {
@@ -35,8 +36,16 @@ int main()
 
 	printf("chip ram at: %08x\n",chipAddressToHost(0));
 
+	if (args==2)
+	{
+		printf("%s\n",arg[1]);
 
-	writeChipByte(0x00000000, 0xFF);
+		if (strcasecmp(arg[1],"FALSE")==0) quit = 0x00;
+	}
+
+	printf("quit = %x\n",quit);
+
+	writeChipByte(0x00000000, quit);
 
 /*
         for (;;)        // busy wait

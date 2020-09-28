@@ -137,19 +137,29 @@ _LVOSetCIATimingAccuracy	EQU -144
 ; chipReadByte sourceOffset,sourceReg,DestReg
 
 chipReadByte		macro 
+	move.l	a0,-(sp)
+	move.l	d1,-(sp)
 	move.l	\2,A0
 	add.l		#\1,A0
 	LINKLIB	_LVOReadChipByte,chipsetBase
 	move.l	d0,\3
+	move.l	(sp)+,d1
+	move.l	(sp)+,a0
 	endm
 
 ; chipWriteByte sourceReg/Value,destOffset,DestReg
 ; chipWriteByte sourceValue,destOffset,DestReg
 
 chipWriteByte		macro 
+	move.l	a0,-(sp)
+	move.l	d1,-(sp)
+	IFNC	'\1','D1'
 	move.l	\1,d1
+	ENDC
 	move.l	\3,A0
 	add.l		#\2,A0
 	LINKLIB	_LVOWriteChipByte,chipsetBase
+	move.l	(sp)+,d1
+	move.l	(sp)+,a0
 	endm
 

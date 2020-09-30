@@ -20,6 +20,8 @@
 ; The register would be set to (3000 / 1.3968255 = 2148).
 ;
 
+;__use_real_chipset__ set 1
+
 	include "lvo/exec_lib.i"
 	include "lvo/dos_lib.i"
 	include "exec/libraries.i"
@@ -41,7 +43,10 @@
 
 main:
 	OPENLIB	dos
+
+	IFND	__use_real_chipset__
 	OPENLIB	chipset
+	ENDC
 
 	lea	txtLibsOpen(pc),a1
 	jsr	_writeText
@@ -50,7 +55,11 @@ main:
 	jsr ciatest
 
 closeLibs:
+
+	IFND	__use_real_chipset__
 	CLOSELIB	chipset
+	ENDC
+
 	CLOSELIB	dos
 	rts
 
@@ -100,17 +109,21 @@ TIME    equ     2148
 ;
 ;----Wait for the timer to count down
 
-	move.l	#0,d1
-	move.l	A4,A0
-	add.l		#ciapra,A0
-	LINKLIB	_LVOBitSetChipByte,chipsetBase
+;	move.l	#0,d1
+;	move.l	A4,A0
+;	add.l		#ciapra,A0
+;	LINKLIB	_LVOBitSetChipByte,chipsetBase
 
+	chipSetBitInByte #0,ciapra,A4
 
 busy_wait:
-	move.l	#0,A0
-	LINKLIB	_LVOReadChipByte,chipsetBase
+
+	IFND	__use_real_chipset__
+	move.l  #0,A0
+	chipReadByte 0,A0,D0
 	tst.b	D0
 	bne.s	.exit		; if something is set in ChipRam then quit...
+	ENDC
 
 ;-------------------------------------------------------------------------------
 ;        btst.b  #0,ciaicr(a4)           ;Wait for timer expired flag
@@ -131,13 +144,13 @@ busy_wait:
 ;        bchg.b  #CIAB_LED,ciapra(a4)    ;Blink light
 ;-------------------------------------------------------------------------------
 
-	chipChgBit #CIAB_LED,ciapra,a4
+	chipChgBitInByte #CIAB_LED,ciapra,a4
 
 ;-------------------------------------------------------------------------------
 ;        bset.b  #0,ciacra(a4)           ;Restart timer
 ;-------------------------------------------------------------------------------
 
-	chipSetBit #0,ciacra,a4
+	chipSetBitInByte #0,ciacra,a4
 
 ;-------------------------------------------------------------------------------
 	bra.s   busy_wait

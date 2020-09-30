@@ -136,13 +136,43 @@ _LVOSetCIATimingAccuracy	EQU -144
 
 ; chipReadByte sourceOffset,sourceReg,DestReg
 
+	IFD	__use_real_chipset__
+
+chipReadByte		macro 
+	move.b	\1(\2),\3
+	endm
+
+chipWriteByte		macro 
+	move.b	\1,(\2)\3
+	endm
+
+chipWriteWord		macro 
+	move.b	\1,(\2)\3
+	endm
+
+chipWriteLong		macro 
+	move.l	\1,(\2)\3
+	endm
+
+chipSetBitInByte	macro 
+	bset.b	\1,\2(\3)
+	endm
+
+chipChgBitInByte	macro 
+	bchg.b	\1,\2(\3)
+	endm
+
+	ELSE
+
 chipReadByte		macro 
 	move.l	a0,-(sp)
 	move.l	d1,-(sp)
 	move.l	\2,A0
 	add.l		#\1,A0
 	LINKLIB	_LVOReadChipByte,chipsetBase
+	IFNC	'\3','D0'
 	move.l	d0,\3
+	ENDC
 	move.l	(sp)+,d1
 	move.l	(sp)+,a0
 	endm
@@ -189,7 +219,7 @@ chipWriteLong		macro
 	move.l	(sp)+,a0
 	endm
 
-chipChgBit	macro
+chipChgBitInByte	macro
 	move.l	a0,-(sp)
 	move.l	d1,-(sp)
 	move.l	\1,d1
@@ -200,15 +230,15 @@ chipChgBit	macro
 	move.l	(sp)+,a0
 	endm
 
-chipSetBit		macro 
+chipSetBitInByte	macro 
 	move.l	a0,-(sp)
 	move.l	d1,-(sp)
 	move.l	\1,d1
 	move.l	\3,A0
 	add.l		#\2,A0
-	LINKLIB	_LVOBitChgChipByte,chipsetBase
+	LINKLIB	_LVOBitSetChipByte,chipsetBase
 	move.l	(sp)+,d1
 	move.l	(sp)+,a0
 	endm
 
-
+	ENDC

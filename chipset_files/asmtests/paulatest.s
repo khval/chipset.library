@@ -1,10 +1,12 @@
 
+;__use_real_chipset__ set 1
 
 	include "lvo/exec_lib.i"
 	include "lvo/dos_lib.i"
 	include "exec/libraries.i"
-
+	
 	include "hardware/custom.i"
+	include "hardware/dmabits.i"
 	include "chipset.i"
 	include "help.i"
 
@@ -15,7 +17,10 @@ custom	EQU	$DFF000
 
 main:
 	OPENLIB	dos
-;	OPENLIB	chipset
+
+	IFND	__use_real_chipset__
+	OPENLIB	chipset
+	ENDC
 
 	INFOHEX #custom+aud0
 
@@ -26,12 +31,18 @@ main:
 
 	DELAY 50
 
+	jsr stopSound
+
 ;	move.l 4.w,a6
 ;	jsr _LVOPermit(a6)
 
 
 closeLibs:
-;	CLOSELIB	chipset
+
+	IFND	__use_real_chipset__
+	CLOSELIB	chipset
+	ENDC
+
 	CLOSELIB	dos
 	rts
 
@@ -50,26 +61,32 @@ playSound:
 		LEA SINEDATA,a1
 
 WHERE0DATA:
-		MOVE.L	A1,aud0!ac_dat(A0)
-;		chipWriteLong A1,aud0+ac_dat,A0
+;		MOVE.L	A1,aud0+ac_ptr(A0)
+		chipWriteLong A1,aud0+ac_ptr,A0
 
 SETAUD0LENGTH:
-		MOVE.W	#4,aud0!ac_len(A0)
-;		chipWriteWord #4,aud0+ac_len,A0
+;		MOVE.W	#4,aud0+ac_len(A0)
+		chipWriteWord #4,aud0+ac_len,A0
 
 SETAUD0VOLUME:
-		MOVE.W	#64,aud0!ac_vol(A0)
-;		chipWriteWord #64,aud0+ac_vol,A0
+;		MOVE.W	#64,aud0+ac_vol(A0)
+		chipWriteWord #64,aud0+ac_vol,A0
 
 SETAUD0PERIOD:
-		MOVE.W	#447,aud0!ac_per(A0)
-;		chipWriteWord	#447,aud0+ac_per,A0
+;		MOVE.W	#447,aud0+ac_per(A0)
+		chipWriteWord	#447,aud0+ac_per,A0
 
 BEGINCHAN0:
-		MOVE.W	#(DMAF_SETCLR!DMAF_AUD0!DMAF_MASTER),dmacon(A0)
-;		chipWriteWord	#(DMAF_SETCLR!DMAF_AUD0!DMAF_MASTER),dmacon,A0
+;		MOVE.W	#(DMAF_SETCLR!DMAF_AUD0!DMAF_MASTER),dmacon(A0)
+		chipWriteWord	#(DMAF_SETCLR!DMAF_AUD0!DMAF_MASTER),dmacon,A0
 		RTS
 		DS.W 0	; Be sure its word-aligned
+
+stopSound:
+		move.l	#custom,a0
+;		MOVE.W	#DMAF_AUD0,dmacon(A0)
+		chipWriteWord	#DMAF_AUD0,dmacon,A0
+		RTS
 
 txtLibsOpen:
 	dc.l	14

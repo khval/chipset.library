@@ -370,8 +370,10 @@ BOOL InstallPUH( ULONG flags,ULONG audio_mode,ULONG frequency,struct PUHData* pd
 	Forbid();
 	pd->m_OldFaultInt = SetIntVector(TRAPNUM_DATA_SEGMENT_VIOLATION, &pd->m_FaultInt);
 	Permit();
-	pd->m_Active = TRUE;
+
 */
+
+	pd->m_Active = TRUE;
 
 	if( ! pd->m_Active )
 	{

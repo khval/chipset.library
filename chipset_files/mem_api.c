@@ -16,6 +16,8 @@ extern uae_u8 *chipmemory ;
 extern bool init_mem();
 extern void cleanup_mem();
 
+extern addrbank nallePuh_bank ;
+
 BOOL setup_mem_banks()
 {
 	init_mem_banks( 0x00FF );
@@ -23,6 +25,7 @@ BOOL setup_mem_banks()
 	map_banks(&chipmem_bank, 0x00,0xFF );
 	map_banks(&cia_bank, 0xA0,32 );
 	map_banks(&clock_bank, 0xDC,1 );
+	map_banks(&nallePuh_bank,0xDF,1);	// Custom chip register bank
 
 	if (init_mem()==FALSE) return FALSE;
 

@@ -26,6 +26,8 @@
 
 #include <stdarg.h>
 
+#define LIBNAME "chipset.library"
+
 /* Version Tag */
 #include "chipset.library_rev.h"
 STATIC CONST UBYTE USED verstag[] = VERSTAG;
@@ -41,9 +43,13 @@ struct ExecIFace *IExec UNUSED = NULL;
 
 struct NewlibIFace * INewlib = NULL;
 struct DOSIFace *IDOS = NULL;
+struct UtilityIFace *IUtility = NULL;
 
 struct Library *NewLibBase = NULL;
 struct Library *DOSBase = NULL;
+struct Library *UtilityBase = NULL;
+
+extern struct AHIIFace *IAHI;
 
 struct Task *main_task = NULL;	// main_task is whatever when running from a library
 struct Process *cia_process = NULL;
@@ -74,6 +80,12 @@ int32 _start(void)
 }
 
 extern void cia_process_fn ();
+
+extern BOOL OpenAHI( void );
+extern void CloseAHI( void );
+
+extern BOOL init_nallepuh(  	ULONG mode_id,ULONG frequency );
+extern void cleanup_nallepuh();
 
 #define __debug_cia__
 
@@ -147,12 +159,20 @@ void close_libs()
 
 	struct ExecIFace *IExec = (struct ExecIFace *)(*(struct ExecBase **)4)->MainInterface;
 
+	if ( ! IAHI ) IDOS->Printf("%s: Failed to open AHI\n",LIBNAME); 
+
 	if (cia_mx) 
 	{
 		IExec -> FreeSysObject(ASOT_MUTEX, cia_mx); 
 		cia_mx = NULL;
 	}
+	else if (IDOS) IDOS->Printf("%s: Failed to create Mutex\n",LIBNAME);
 
+	cleanup_nallepuh();
+
+	CloseAHI();
+
+	close_lib( UtilityBase, IUtility );
 	close_lib( DOSBase, IDOS);
 	close_lib( NewLibBase, INewlib);
 }
@@ -207,6 +227,12 @@ BOOL init()
 {
 	if ( ! open_lib( "dos.library", 53L , "main", 1, &DOSBase, (struct Interface **) &IDOS  ) ) return FALSE;
 	if ( ! open_lib( "newlib.library", 53L , "main", 1, &NewLibBase, (struct Interface **) &INewlib  ) ) return FALSE;
+	if ( ! open_lib( "utility.library", 53L , "main", 1, &UtilityBase, (struct Interface **) &IUtility  ) ) return FALSE;
+	if ( ! OpenAHI() ) return FALSE;
+
+	// AHI mode ID, check AHI prefs, need to improve this part.
+
+	if ( ! init_nallepuh( 0x3E0007,48000 ) ) return FALSE;
 
 	cia_mx = (APTR) IExec -> AllocSysObjectTags(ASOT_MUTEX, TAG_DONE);
 	if ( ! cia_mx) return FALSE;
@@ -254,7 +280,7 @@ STATIC struct Library *libInit(struct Library *LibraryBase, APTR seglist, struct
 
 	libBase->libNode.lib_Node.ln_Type = NT_LIBRARY;
 	libBase->libNode.lib_Node.ln_Pri  = 0;
-	libBase->libNode.lib_Node.ln_Name = "chipset.library";
+	libBase->libNode.lib_Node.ln_Name = LIBNAME;
 	libBase->libNode.lib_Flags        = LIBF_SUMUSED|LIBF_CHANGED;
 	libBase->libNode.lib_Version      = VERSION;
 	libBase->libNode.lib_Revision     = REVISION;

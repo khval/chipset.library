@@ -37,6 +37,11 @@ OPT = -DNO_INLINE_MEMORY_ACCESS
 # Version of the library to build
 VERSION = 53
 
+nallePuh_srcs = NallePUH/src/Nalle.c \
+		NallePUH/src/api.c \
+		NallePUH/src/PUH.c 
+
+
 # "main" Interface Source Files
 main_SRCS = main/Obtain.c main/Release.c main/allocChip.c main/freeChip.c \
 	main/hostAddressToChip.c main/chipAddressToHost.c  \
@@ -73,7 +78,10 @@ main_SRCS = main/Obtain.c main/Release.c main/allocChip.c main/freeChip.c \
 
 SRCS = init.c
 
-OBJS = $(main_SRCS:.c=.o)  $(SRCS:.c=.o)
+OBJS = $(main_SRCS:.c=.o)  $(SRCS:.c=.o) \
+	$(nallePuh_srcs:.c=.o) 
+
+
 # Rules for building
 $(TARGET): $(OBJS)
 	$(CC) $(LINK) -nostartfiles -o $(TARGET) $(OBJS) $(LIBS)
@@ -95,6 +103,9 @@ mem_api.o:		mem_api.c
 
 68k_stubs.o:	68k_stubs.c
 	gcc  -Wall -O3  $(INC)  -c -o 68k_stubs.o 68k_stubs.c
+
+NallePUH/src/%.o: NallePUH/src/%.c
+	gcc  -Wall -O3 $(INC)  -c  $(@:.o=.c) -o $@
 
 
 .PHONY: clean

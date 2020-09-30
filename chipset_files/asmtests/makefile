@@ -17,7 +17,8 @@ tests = openlib.exe	\
 	chipmem.exe \
 	timeing.exe \
 	probe.exe \
-	bitchg.exe
+	bitchg.exe \
+	paulatest.exe
 
 all:	${tests} 
 
@@ -45,6 +46,10 @@ probe.exe: probe.s
 bitchg.exe: bitchg.s
 		$(compiler) $(options) $(inc) -Fhunk -o obj/bitchg.o bitchg.s 
 		$(link) -bamigahunk -o bitchg.exe -s  obj/bitchg.o
+
+paulatest.exe: paulatest.s
+		$(compiler) $(options) $(inc) -Fhunk -o obj/paulatest.o paulatest.s 
+		$(link) -bamigahunk -o paulatest.exe -s  obj/paulatest.o
 
 .PRECIOUS: %.hunk 
 

@@ -322,7 +322,7 @@ BOOL InstallPUH( ULONG flags,ULONG audio_mode,ULONG frequency,struct PUHData* pd
 
 	if( pd->m_AudioCtrl == NULL )
 	{
-		LogPUH( pd, "Unable to allocate audio mode $%08lx.", audio_mode );
+		printf( "Unable to allocate audio mode $%08lx.", audio_mode );
 	}
 	else
 	{
@@ -335,7 +335,7 @@ BOOL InstallPUH( ULONG flags,ULONG audio_mode,ULONG frequency,struct PUHData* pd
 
 		if( AHI_LoadSound( 0, AHIST_DYNAMICSAMPLE, &si, pd->m_AudioCtrl ) != AHIE_OK )
 		{
-			LogPUH( pd, "Unable to load dynamic sample." );
+			printf( "Unable to load dynamic sample." );
 		}
 		else
 		{
@@ -343,7 +343,7 @@ BOOL InstallPUH( ULONG flags,ULONG audio_mode,ULONG frequency,struct PUHData* pd
 					AHIC_Play, TRUE,
 					TAG_DONE ) != AHIE_OK )
 			{
-				LogPUH( pd, "Unable to start playback." );
+				printf( "Unable to start playback." );
 			}
 			else
 			{

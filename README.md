@@ -92,7 +92,7 @@ For developers who write 680x0 assembler have a look here.
 
 https://github.com/khval/chipset.library/blob/master/chipset_library_asm_docs.md
 
-# Compiling 
+# Compiling the chipset.library and tests.
 
 To compile the 680x0 lib tests, you need to make a assign in s:user-startup like
 

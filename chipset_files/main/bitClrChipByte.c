@@ -61,9 +61,7 @@
 *
 */
 
-void _chipset_bitClrChipByte(struct chipsetIFace *Self,
-       char * offset,
-       ULONG bit)
+void _chipset_bitClrChipByte(struct chipsetIFace *Self, char * offset, ULONG bit)
 {
   _bitClrChipByte(offset, bit);
 }

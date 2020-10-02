@@ -81,6 +81,17 @@ To compileon C/C++ code you need the AmigaOS4.1 SDK.
 
 https://wiki.amigaos.net/wiki/Programming_AmigaOS_4:_The_Development_Environment
 
+# development 
+
+For developers who write C/C++ code please have look at this documentation.
+(Sadly this library does not yet have equal for AmigaOS3.x)
+
+https://github.com/khval/chipset.library/blob/master/chipset_library_docs.md
+
+For developers who write 680x0 assembler have a look here.
+
+..... Sorry no docs yet .....
+
 # Compiling 
 
 To compile the 680x0 lib tests, you need to make a assign in s:user-startup like

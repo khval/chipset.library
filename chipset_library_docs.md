@@ -82,11 +82,15 @@ void allocChip( uint32_t size )
 	should have access to it, if its moved to PCIe card or some other add on card, 
 	its expected we need to translate address between two spaces.
 
+	(I guess it good idea to have a compile time option to point to native OS functions, when using real address space.)
+
 void freeChip(void * mem)
 
 	Free virtual memory on PCIe / Zorro card, or memory from emulated memory space.
 
 	Currently it's not needed for Paula/NallePuh in chipset.library, but it can be needed in the future.
+
+	(I guess its a good idea to have a compile time option to point to native OS functions, when using real address space.)
 
 void * chipAddressToHost(void * adr)
 
@@ -94,11 +98,15 @@ void * chipAddressToHost(void * adr)
 
 	Currently its not needed for Paula/NallePuh in chipset.library, but it can be needed in the future.
 
+	(I guess its a good idea to have a compile time option to map address 1 to 1, when using real address space.)
+
 void * hostAddressToChip( void * adr )
 
 	Convert address space from system address space to a PCIe / emulated address space.
 
-	Currently its not needed for Paula/NallePuh in chipset.library, but it can be needed in the future.		
+	Currently its not needed for Paula/NallePuh in chipset.library, but it can be needed in the future.
+	
+	(I guess its a good idea to have a compile time option to map address 1 to 1, when using real address space.)
 
 ULONG readChipByte( char * offset )
 
@@ -122,7 +130,7 @@ ULONG writeChipByte( char * offset )
 
 	unlike memory the hardware registers, change states see the Amiga hardware reference manual.
 
-		Not all hardware register, supports bytes.
+	(Not all hardware register, supports bytes.)
 
 ULONG writeChipWord( char * offset )
 
@@ -145,15 +153,18 @@ void setCIATimingAccuracy( int us )
 
 	When emulating the CIA, we need to generate the clock count, we do this by calculating the time difference, 
 	between etch time the MOS8520 CIA chip is waked up, divided it the CPU cycle time, 
-	if the MOS8520 is waken up too often you get high CPU cycle usage, and maybe unassay high accuracy,
-	if its too low it can get some lag in number cycles.
-	ULONG spyCIAA( ULONG Addr )
+	if the MOS8520 is waken up too often you get high CPU usage, and maybe unassay high accuracy,
+	if its too low it can get some lag in the number cycles.
 
-	This one is a lot like readChipWord, but it only works on CIAA.
+ULONG spyCIAA( ULONG Addr )
+
+	This one is a lot like readChipWord, but it only works on CIAA.	
+	Spy does not trigger anything in the emulation, unlike read.
 
 ULONG spyCIAB( ULONG Addr )
 
 	This one is a lot like readChipWord, but it only works on CIAB.
+	Spy does not trigger anything in the emulation, unlike read.
 
 void writeChipByte( char * offset, ULONG value)
 

@@ -5,7 +5,7 @@ This library contains CIA.c from UADE (Unix Amiga Delitracker emulator) / UAE (u
 
 # The plan
 
-Make it easy to replace direct access to chipset by macro, that enable quick conversions of not so system friendly code, while this not ideal way to run 680x0 software, its better then trapping and patches.
+Make it easy to replace direct access to chipset by macro, that enable quick conversions of not so system friendly code, while this not ideal way to run 680x0 software, its better then trapping and patches. And a lot more convenient and efficient then using EUAE.
 
 Because you need the source code, to make use of this library its only possible for open source 680x0 assembler code, there are some interesting stuff around, demos, and libraries and games, and other stuff, Google around see what you can find.
 

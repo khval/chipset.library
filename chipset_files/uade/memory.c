@@ -46,6 +46,7 @@ addrbank mem_banks[0x00FF];
 #define call_mem_put_func(func,addr,v) ((*func)(addr,v))
 
 #ifdef NO_INLINE_MEMORY_ACCESS
+
 inline uae_u32 longget (uaecptr addr)
 {
     return call_mem_get_func (get_mem_bank (addr).lget, addr);
@@ -70,6 +71,7 @@ inline void byteput (uaecptr addr, uae_u32 b)
 {
     call_mem_put_func (get_mem_bank (addr).bput, addr, b);
 }
+
 #endif
 
 static uae_u32 chipmem_mask;

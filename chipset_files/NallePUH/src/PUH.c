@@ -68,10 +68,7 @@
 
 static bool puh_RemapMemory( struct PUHData* pd );
 
-
-static BOOL
-RestoreMemory( struct PUHData* pd );
-
+static BOOL RestoreMemory( struct PUHData* pd );
 UWORD PUHRead( UWORD reg, BOOL *handled );
 void PUHWrite( UWORD reg, UWORD value, BOOL *handled );
 
@@ -169,8 +166,7 @@ void WriteLong( void* address, ULONG value )
 
 extern struct PUHData* pd;
 
-struct PUHData*
-AllocPUH( void )
+struct PUHData*AllocPUH( void )
 {
 
 	struct GfxBase* gfxbase = NULL;
@@ -184,8 +180,7 @@ AllocPUH( void )
 	gfxbase = (struct GfxBase*) OpenLibrary( GRAPHICSNAME, 39 );
 
 	{
-		pd = (struct PUHData*) AllocVec( sizeof( struct PUHData ),
-																		 MEMF_PUBLIC | MEMF_CLEAR );
+		pd = (struct PUHData*) AllocVec( sizeof( struct PUHData ), MEMF_PUBLIC | MEMF_CLEAR );
 
 		if( pd == NULL )
 		{
@@ -237,8 +232,7 @@ AllocPUH( void )
 ** Deallocate PUH *************************************************************
 ******************************************************************************/
 
-void
-FreePUH( struct PUHData* pd )
+void FreePUH( struct PUHData* pd )
 {
 	if( pd != NULL )
 	{
@@ -254,9 +248,7 @@ FreePUH( struct PUHData* pd )
 ** Set/change log hook ********************************************************
 ******************************************************************************/
 
-void
-SetPUHLogger( struct Hook*		hook,
-							struct PUHData* pd )
+void SetPUHLogger( struct Hook *hook, struct PUHData* pd )
 {
 	pd->m_LogHook = hook;
 }
@@ -266,17 +258,14 @@ SetPUHLogger( struct Hook*		hook,
 ** Send a message to the log function *****************************************
 ******************************************************************************/
 
-void VARARGS68K
-LogPUH( struct PUHData* pd,
-				STRPTR					fmt,
-				... )
+void VARARGS68K LogPUH( struct PUHData* pd, STRPTR fmt, ... )
 {
 	va_list ap;
 
 	#ifdef __amigaos4__
-	va_startlinear( ap, fmt );
+		va_startlinear( ap, fmt );
 	#else
-	va_start( ap, fmt );
+		va_start( ap, fmt );
 	#endif
 
 	if( pd->m_LogHook == NULL )
@@ -287,11 +276,11 @@ LogPUH( struct PUHData* pd,
 	else
 	{
 		char		buffer[ 256 ];
-	 #ifdef __amigaos4__
-	 VSNPrintf( buffer, sizeof( buffer ), fmt, va_getlinearva(ap, void *) );
-	 #else
-		vsnprintf( buffer, sizeof( buffer ), fmt, ap );
-	 #endif
+		 #ifdef __amigaos4__
+			 VSNPrintf( buffer, sizeof( buffer ), fmt, va_getlinearva(ap, void *) );
+		 #else
+			vsnprintf( buffer, sizeof( buffer ), fmt, ap );
+		 #endif
 
 		CallHookPkt( pd->m_LogHook, pd, buffer );
 	}
@@ -329,8 +318,8 @@ BOOL InstallPUH( ULONG flags,ULONG audio_mode,ULONG frequency,struct PUHData* pd
 		struct AHISampleInfo si =
 		{
 			AHIST_M8S,	 // An 8-bit sample
-			0,					 // beginning at address 0
-			0xffffffff	 // and ending at the last address.
+			0,			 // beginning at address 0
+			0xffffffff		 // and ending at the last address.
 		};
 
 		if( AHI_LoadSound( 0, AHIST_DYNAMICSAMPLE, &si, pd->m_AudioCtrl ) != AHIE_OK )
@@ -339,9 +328,7 @@ BOOL InstallPUH( ULONG flags,ULONG audio_mode,ULONG frequency,struct PUHData* pd
 		}
 		else
 		{
-			if( AHI_ControlAudio( pd->m_AudioCtrl,
-					AHIC_Play, TRUE,
-					TAG_DONE ) != AHIE_OK )
+			if( AHI_ControlAudio( pd->m_AudioCtrl, AHIC_Play, TRUE, TAG_DONE ) != AHIE_OK )
 			{
 				printf( "Unable to start playback." );
 			}
@@ -403,7 +390,7 @@ void UninstallPUH( struct PUHData* pd )
 	{
 		 Forbid();
 		SetIntVector(TRAPNUM_DATA_SEGMENT_VIOLATION, pd->m_OldFaultInt);
-	 Permit();
+		 Permit();
 	}
 
 	if( pd->m_Active )
@@ -417,8 +404,8 @@ void UninstallPUH( struct PUHData* pd )
 		pd->m_AudioCtrl = NULL;
 	}
 
-	pd->m_Flags		 = 0L;
-	pd->m_AudioMode = AHI_INVALID_ID;
+	pd->m_Flags		= 0L;
+	pd->m_AudioMode	= AHI_INVALID_ID;
 	pd->m_Active		= FALSE;
 }
 
@@ -570,10 +557,10 @@ void PUHWrite( UWORD	reg, UWORD value, BOOL*handled )
 					else
 					{
 						AHI_SetSound( 0, 0,
-													pd->m_SoundLocation[ 0 ],
-													pd->m_SoundLength[ 0 ],
-													pd->m_AudioCtrl,
-													AHISF_IMM );
+								pd->m_SoundLocation[ 0 ],
+								pd->m_SoundLength[ 0 ],
+								pd->m_AudioCtrl,
+								AHISF_IMM );
 					}
 				}
 				else
@@ -598,10 +585,10 @@ void PUHWrite( UWORD	reg, UWORD value, BOOL*handled )
 					else
 					{
 						AHI_SetSound( 1, 0,
-													pd->m_SoundLocation[ 1 ],
-													pd->m_SoundLength[ 1 ],
-													pd->m_AudioCtrl,
-													AHISF_IMM );
+								pd->m_SoundLocation[ 1 ],
+								pd->m_SoundLength[ 1 ],
+								pd->m_AudioCtrl,
+								AHISF_IMM );
 					}
 				}
 				else
@@ -626,10 +613,10 @@ void PUHWrite( UWORD	reg, UWORD value, BOOL*handled )
 					else
 					{
 						AHI_SetSound( 2, 0,
-													pd->m_SoundLocation[ 2 ],
-													pd->m_SoundLength[ 2 ],
-													pd->m_AudioCtrl,
-													AHISF_IMM );
+								pd->m_SoundLocation[ 2 ],
+								pd->m_SoundLength[ 2 ],
+								pd->m_AudioCtrl,
+								AHISF_IMM );
 					}
 				}
 				else
@@ -654,10 +641,10 @@ void PUHWrite( UWORD	reg, UWORD value, BOOL*handled )
 					else
 					{
 						AHI_SetSound( 3, 0,
-													pd->m_SoundLocation[ 3 ],
-													pd->m_SoundLength[ 3 ],
-													pd->m_AudioCtrl,
-													AHISF_IMM );
+								pd->m_SoundLocation[ 3 ],
+								pd->m_SoundLength[ 3 ],
+								pd->m_AudioCtrl,
+								AHISF_IMM );
 					}
 				}
 				else
@@ -675,6 +662,7 @@ void PUHWrite( UWORD	reg, UWORD value, BOOL*handled )
 		}
 
 		case INTENA:
+
 			if( value & INTF_SETCLR )
 			{
 				pd->m_INTENA |= ( value & ~INTF_SETCLR );
@@ -699,8 +687,8 @@ void PUHWrite( UWORD	reg, UWORD value, BOOL*handled )
 			}
 			break;
 
-
 		case INTREQ:
+
 			if( value & INTF_SETCLR )
 			{
 				pd->m_INTREQ |= ( value & ~INTF_SETCLR );
@@ -712,8 +700,7 @@ void PUHWrite( UWORD	reg, UWORD value, BOOL*handled )
 
 			WriteWord( address, value & ~INTF_AUDIO );
 
-			if( ( pd->m_INTENA & pd->m_INTREQ & INTF_AUDIO ) &&
-					! pd->m_CausePending )
+			if( ( pd->m_INTENA & pd->m_INTREQ & INTF_AUDIO ) &&	 !pd->m_CausePending )
 			{
 				pd->m_CausePending = TRUE;
 				Cause( &pd->m_SoftInt );
@@ -734,41 +721,40 @@ void PUHWrite( UWORD	reg, UWORD value, BOOL*handled )
 		case AUD1LCH:
 		case AUD2LCH:
 		case AUD3LCH:
-	{
-		int channel		 = ( reg - AUD0LCH ) >> 4;
-
-			pd->m_SoundLocation[ channel ] &= 0x0000ffff;
-			pd->m_SoundLocation[ channel ] |= value << 16;
-
-			*handled = TRUE;
-
-		pd->m_GotDatHi[channel] = TRUE;
-
-		if (pd->m_GotDatLo[channel])
-		{
-			pd->m_GotDatHi[channel] =
-		pd->m_GotDatLo[channel] = FALSE;
-
-		if( pd->m_SoundOn[ channel ] )
-		{
-			// Queue it
-			if( pd->m_SoundLength[ channel ] == 2 )
 			{
-			// SoundTracker-style silece
-			AHI_SetSound( channel, AHI_NOSOUND,
-							0, 0, pd->m_AudioCtrl, AHISF_NONE );
+				int channel		 = ( reg - AUD0LCH ) >> 4;
+
+				pd->m_SoundLocation[ channel ] &= 0x0000ffff;
+				pd->m_SoundLocation[ channel ] |= value << 16;
+
+				*handled = TRUE;
+
+				pd->m_GotDatHi[channel] = TRUE;
+
+				if (pd->m_GotDatLo[channel])
+				{
+					pd->m_GotDatHi[channel] =
+					pd->m_GotDatLo[channel] = FALSE;
+
+					if( pd->m_SoundOn[ channel ] )
+					{
+						// Queue it
+						if( pd->m_SoundLength[ channel ] == 2 )
+						{
+							// SoundTracker-style silece
+							AHI_SetSound( channel, AHI_NOSOUND,	0, 0, pd->m_AudioCtrl, AHISF_NONE );
+						}
+						else
+						{
+							AHI_SetSound( channel, 0,
+								pd->m_SoundLocation[ channel ],
+								pd->m_SoundLength[ channel ],
+								pd->m_AudioCtrl,
+								AHISF_NONE );
+						}
+					}
+				}
 			}
-			else
-			{
-			AHI_SetSound( channel, 0,
-							pd->m_SoundLocation[ channel ],
-							pd->m_SoundLength[ channel ],
-							pd->m_AudioCtrl,
-							AHISF_NONE );
-			}
-		}
-		}
-	}
 			break;
 
 		case AUD0LCL:
@@ -781,32 +767,32 @@ void PUHWrite( UWORD	reg, UWORD value, BOOL*handled )
 			pd->m_SoundLocation[ channel ] &= 0xffff0000;
 			pd->m_SoundLocation[ channel ] |= value;
 
-		pd->m_GotDatLo[channel] = TRUE;
+			pd->m_GotDatLo[channel] = TRUE;
 
-		if (pd->m_GotDatHi[channel])
-		{
-			pd->m_GotDatHi[channel] =
-		pd->m_GotDatLo[channel] = FALSE;
-
-		if( pd->m_SoundOn[ channel ] )
-		{
-			// Queue it
-			if( pd->m_SoundLength[ channel ] == 2 )
+			if (pd->m_GotDatHi[channel])
 			{
-			// SoundTracker-style silece
-			AHI_SetSound( channel, AHI_NOSOUND,
+				pd->m_GotDatHi[channel] =
+				pd->m_GotDatLo[channel] = FALSE;
+
+				if( pd->m_SoundOn[ channel ] )
+				{
+					// Queue it
+					if( pd->m_SoundLength[ channel ] == 2 )
+					{
+						// SoundTracker-style silece
+						AHI_SetSound( channel, AHI_NOSOUND,
 							0, 0, pd->m_AudioCtrl, AHISF_NONE );
-			}
-			else
-			{
-			AHI_SetSound( channel, 0,
+					}
+					else
+					{
+						AHI_SetSound( channel, 0,
 							pd->m_SoundLocation[ channel ],
 							pd->m_SoundLength[ channel ],
 							pd->m_AudioCtrl,
 							AHISF_NONE );
+					}
+				}
 			}
-		}
-		}
 
 			*handled = TRUE;
 			break;
@@ -828,15 +814,15 @@ void PUHWrite( UWORD	reg, UWORD value, BOOL*handled )
 				{
 					// SoundTracker-style silece
 					AHI_SetSound( channel, AHI_NOSOUND,
-												0, 0, pd->m_AudioCtrl, AHISF_NONE );
+							0, 0, pd->m_AudioCtrl, AHISF_NONE );
 				}
 				else
 				{
 					AHI_SetSound( channel, 0,
-												pd->m_SoundLocation[ channel ],
-												pd->m_SoundLength[ channel ],
-												pd->m_AudioCtrl,
-												AHISF_NONE );
+							pd->m_SoundLocation[ channel ],
+							pd->m_SoundLength[ channel ],
+							pd->m_AudioCtrl,
+							AHISF_NONE );
 				}
 			}
 
@@ -856,16 +842,16 @@ void PUHWrite( UWORD	reg, UWORD value, BOOL*handled )
 				// What is the correct emulation for this?
 
 				AHI_SetFreq( channel,
-										 pd->m_ChipFreq >> 16,
-										 pd->m_AudioCtrl,
-										 AHISF_IMM );
+							 pd->m_ChipFreq >> 16,
+							 pd->m_AudioCtrl,
+							 AHISF_IMM );
 			}
 			else
 			{
 				AHI_SetFreq( channel,
-										 pd->m_ChipFreq / value,
-										 pd->m_AudioCtrl,
-										 AHISF_IMM );
+							 pd->m_ChipFreq / value,
+							 pd->m_AudioCtrl,
+							 AHISF_IMM );
 			}
 
 			*handled = TRUE;
@@ -1051,9 +1037,7 @@ SAVEDS static void PUHSoftInt(struct ExceptionContext *pContext, struct ExecBase
 	while (mask != 0);
 }
 
-SAVEDS static void PUHSoundFunc( REG( a0, struct Hook *hook ),
-							REG( a2, struct AHIAudioCtrl *actrl ),
-							REG( a1, struct AHISoundMessage* msg ) )
+SAVEDS static void PUHSoundFunc( REG( a0, struct Hook *hook ), REG( a2, struct AHIAudioCtrl *actrl ), REG( a1, struct AHISoundMessage* msg ) )
 {
 	struct PUHData* pd		= (struct PUHData*) hook->h_Data;
 
@@ -1061,9 +1045,9 @@ SAVEDS static void PUHSoundFunc( REG( a0, struct Hook *hook ),
 
 	if( pd->m_INTENA & pd->m_INTREQ & INTF_AUDIO )
 	{
-			if (!pd->m_CausePending)
+		if (!pd->m_CausePending)
 		{
-				pd->m_CausePending = TRUE;
+			pd->m_CausePending = TRUE;
 	 		Cause(&pd->m_SoftInt);
 		}
 	}

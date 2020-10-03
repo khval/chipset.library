@@ -41,7 +41,32 @@ int used_blocks[512];
 extern uae_u8 *chipmemory ;
 
 #define AllocVecShared(_size_) AllocVecTags( _size_,  AVT_Type, MEMF_SHARED,  AVT_Alignment,  16, TAG_DONE)
+#define AllocVecChip(_size_) AllocVec( _size_, MEMF_CHIP )
 
+
+#ifdef __virtual_chipram_no__
+
+void grow_mem_list( int n ) {}
+
+bool init_mem() 
+{
+	chipmemory = 0x0;	// Sets the memory offset to chipram
+	return true; 
+}
+
+void cleanup_mem() {}
+
+char *_allocChip(uint32_t size) 
+{ 
+	return AllocVecChip( size  ); 
+}
+
+void _freeChip(void *adr) { FreeVec( adr ); }
+
+
+#endif
+
+#ifdef __virtual_chipram_yes__
 
 void grow_mem_list( int n )
 {
@@ -195,4 +220,4 @@ void _freeChip(void *adr)
 	}
 }
 
-
+#endif

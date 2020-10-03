@@ -4,6 +4,10 @@
 # $Id: genskeleton.cpp,v 1.13 2010-03-17 14:37:07 cmincea Exp $
 # 
 
+
+OPT = -DNO_INLINE_MEMORY_ACCESS
+OPT+= -D__virtual_chipram_no__
+
 # Uncomment the next line if you are cross compiling
 # CROSS_COMPILE = ppc-amigaos-
 
@@ -32,7 +36,7 @@ LIBS =
 INC = -I../ -I./
 
 
-OPT = -DNO_INLINE_MEMORY_ACCESS
+
 
 # Version of the library to build
 VERSION = 53
@@ -71,7 +75,8 @@ main_SRCS = main/Obtain.c main/Release.c main/allocChip.c main/freeChip.c \
 	timer_device.c \
 	spawn.c \
 	mem_api.c \
-	68k_stubs.c
+	68k_stubs.c \
+	ahi_prefs.c
 
 # -------------------------------------------------------------
 # Nothing should need changing below this line
@@ -87,7 +92,7 @@ $(TARGET): $(OBJS)
 	$(CC) $(LINK) -nostartfiles -o $(TARGET) $(OBJS) $(LIBS)
 
 micro_sys/memory.o: micro_sys/memory.h micro_sys/memory.c 
-	$(CC) $(LINK) $(INC) -c $(@:.o=.c) -o $@
+	$(CC) $(LINK) $(INC) $(OPT) -c $(@:.o=.c) -o $@
 
 main/%.o:		main/%.c 
 	gcc  -Wall -O3  $(INC) $(OPT) -c  -D__USE_INLINE__ -D__no_stdlib__ $(@:.o=.c) -o $@

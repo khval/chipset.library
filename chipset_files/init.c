@@ -4,7 +4,7 @@
  *  This file is part of chipset.
  *
  *  Copyright (c) 2020 LiveForIt Software.
- *  GPL2 License.
+ *  LGPL License.
  *
  * $Id$
  *
@@ -50,6 +50,10 @@ struct Library *DOSBase = NULL;
 struct Library *UtilityBase = NULL;
 
 extern struct AHIIFace *IAHI;
+
+extern void read_ahi_prefs();
+extern uint32_t	ahi_mode_id;
+extern uint32_t	ahi_frequency;
 
 struct Task *main_task = NULL;	// main_task is whatever when running from a library
 struct Process *cia_process = NULL;
@@ -232,7 +236,9 @@ BOOL init()
 
 	// AHI mode ID, check AHI prefs, need to improve this part.
 
-	if ( ! init_nallepuh( 0x3E0007,48000 ) ) return FALSE;
+	read_ahi_prefs();
+
+	if ( ! init_nallepuh( ahi_mode_id,ahi_frequency ) ) return FALSE;
 
 	cia_mx = (APTR) IExec -> AllocSysObjectTags(ASOT_MUTEX, TAG_DONE);
 	if ( ! cia_mx) return FALSE;

@@ -3,8 +3,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include "uade/cia.h"
-#include "uade/events.h"
+#include "uae/cia.h"
+#include "uae/events.h"
 
 #define __USE_INLINE__
 

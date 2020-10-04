@@ -28,9 +28,9 @@
 #include <libraries/chipset.h>
 #include <proto/chipset.h>
 
-#include "../uade/sysconfig.h"
-#include "../uade/sysdeps.h"
-#include "../uade/memory.h"
+#include "../uae/sysconfig.h"
+#include "../uae/sysdeps.h"
+#include "../uae/memory.h"
 
 /****** chipset/main/bitClrChipByte ******************************************
 *
@@ -61,7 +61,9 @@
 *
 */
 
-void _chipset_bitClrChipByte(struct chipsetIFace *Self, char * offset, ULONG bit)
+void _chipset_bitClrChipByte(struct chipsetIFace *Self,
+       char * offset,
+       ULONG bit)
 {
   _bitClrChipByte(offset, bit);
 }

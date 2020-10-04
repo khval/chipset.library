@@ -1,22 +1,22 @@
 /* $Id: PUH.c,v 1.17 2001/05/04 08:43:33 lcs Exp $ */
 
 /*
-     NallePUH -- Paula utan henne -- A minimal Paula emulator.
-     Copyright (C) 2001 Martin Blom <martin@blom.org>
-     
-     This program is free software; you can redistribute it and/or
-     modify it under the terms of the GNU General Public License
-     as published by the Free Software Foundation; either version 2
-     of the License, or (at your option) any later version.
-     
-     This program is distributed in the hope that it will be useful,
-     but WITHOUT ANY WARRANTY; without even the implied warranty of
-     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-     GNU General Public License for more details.
-     
-     You should have received a copy of the GNU General Public License
-     along with this program; if not, write to the Free Software
-     Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+		 NallePUH -- Paula utan henne -- A minimal Paula emulator.
+		 Copyright (C) 2001 Martin Blom <martin@blom.org>
+		 
+		 This program is free software; you can redistribute it and/or
+		 modify it under the terms of the GNU General Public License
+		 as published by the Free Software Foundation; either version 2
+		 of the License, or (at your option) any later version.
+		 
+		 This program is distributed in the hope that it will be useful,
+		 but WITHOUT ANY WARRANTY; without even the implied warranty of
+		 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	See the
+		 GNU General Public License for more details.
+		 
+		 You should have received a copy of the GNU General Public License
+		 along with this program; if not, write to the Free Software
+		 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
 
@@ -57,8 +57,8 @@
 #define SIZEOF_SHORT 2
 #define SIZEOF_INT 4
 
-#include "uade/sysdeps.h"
-#include "uade/memory.h"
+#include "uae/sysdeps.h"
+#include "uae/memory.h"
 
 
 #define INTF_AUDIO	 ( INTF_AUD3 | INTF_AUD2 | INTF_AUD1 | INTF_AUD0 )

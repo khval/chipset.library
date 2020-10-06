@@ -1,22 +1,22 @@
 # chipset.library
 
 So the idea is to create a chipset API, for 680x0 programs to use, this allow chipset to be replaced by soft CHIP or chip on a PCIe card.
-This library contains CIA.c from UADE (Unix Amiga Delitracker emulator) / UAE (unix amiga emulator), and NallePuh the Paula emulator.
+This library contains CIA.c from UADE (Unix Amiga Delitracker emulator), and blitter.c & parts of custum.c from UAE (unix amiga emulator), and NallePuh the Paula emulator.
 
 # The plan
 
-Make it easy to replace direct access to chipset by macro, that enable quick conversions of not so system friendly code, while this not ideal way to run 680x0 software, its better then trapping and patches. And a lot more convenient and efficient then using EUAE.
+Make it easy to replace direct access to chipset by macro's, that enable quick conversions of not so system friendly code, while this not ideal way to run 680x0 software, its better then trapping and patches. And a lot more convenient and efficient then using EUAE.
 
 Because you need the source code, to make use of this library its only possible for open source 680x0 assembler code, there are some interesting stuff around, demos, and libraries and games, and other stuff, Google around see what you can find.
 
-I do not expect people to reverse engineer code, its often not so easy to recompile and make the code work, because the disassemblers, can’t recover macros, if your code depends on correct offsets and delta values, or if can’t tell the difference between data and code. The code is messy hard to read, and hard to work with. (but not impossible.)
+I do not expect people to reverse engineer code, its often not so easy to recompile and make the code work, because the disassemblers, can’t recover macros, if your code depends on correct offsets and delta values, or if can’t tell the difference between data and code. The reverse engineer code is messy hard to read, and hard to work with. (but not impossible.)
 
 Tools can be written to provide amiga joystick and mouse statue, or monitor the emulated chips, some tools already exist.
 
 AGA / OCS is not that useful to emulate, blitter and copper and so can be replaced by other code, 
 pretty easy, at least if your working with a open source 680x0 program.
 
-I’m thinking about providing bitter, just because I can, the more I make it easy for you the more likely you have success with it maybe.
+I’m thinking about providing blitter, just because I can, the more I make it easy for you the more likely you have success with it maybe.
 
 Do not expect chipset.libary to work under forbid() / permit() locks.
 Multitasking is needed for correct as possible values; however, it is designed to compensate for any 
@@ -54,7 +54,7 @@ time lags caused by interruptions in the task scheduler.
 
         Takes up a PCI or PCIE slot.
 
-# Real CIAA/CIAB Hardware
+# Real / native Amiga chipset
 
  **Advantages**
 

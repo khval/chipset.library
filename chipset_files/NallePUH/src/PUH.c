@@ -456,6 +456,8 @@ static BOOL RestoreMemory( struct PUHData* pd )
 ** Handle reads ***************************************************************
 ******************************************************************************/
 
+extern uae_u32 REGPARAM2 custom_wget (uaecptr addr );
+
 UWORD PUHRead( UWORD reg, BOOL *handled )
 {
 	UWORD	result;
@@ -490,7 +492,7 @@ UWORD PUHRead( UWORD reg, BOOL *handled )
 		default:
 			// Just carry out the intercepted read operation
 
-			result = ReadWord( address );
+			result = custom_wget ( address );
 			break;
 	}
 
@@ -502,6 +504,8 @@ UWORD PUHRead( UWORD reg, BOOL *handled )
 ** Handle writes **************************************************************
 ******************************************************************************/
 	
+extern bool custom_wput ( uaecptr addr, uae_u32 value);
+
 void PUHWrite( UWORD	reg, UWORD value, BOOL*handled )
 {
 	UWORD* address = (UWORD*) ( (ULONG) pd->m_CustomDirect + reg );
@@ -963,9 +967,14 @@ void PUHWrite( UWORD	reg, UWORD value, BOOL*handled )
 			break;
 
 		default:
-			// Just carry out the intercepted write operation
 
-			WriteWord( address, value );
+			// do the normal stuff.
+			if (custom_wput ( address,  value) == false)
+			{
+
+				// Just carry out the intercepted write operation
+				WriteWord( address, value );
+			}
 			break;
 	}
 }

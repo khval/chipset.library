@@ -51,7 +51,7 @@ void grow_mem_list( int n ) {}
 
 bool init_mem() 
 {
-	int size = 2097120;
+	int size = 2097152; // bytes
 	chipmemory = 0x0;	// Sets the memory offset to chipram
  	chipmem_mask = size - 1;
 	return true; 

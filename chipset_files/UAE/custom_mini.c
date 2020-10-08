@@ -394,3 +394,32 @@ uae_u32 REGPARAM2 custom_wget (uaecptr addr )
 	return v;
 }
 
+uint32_t currcycle = 0;
+
+void init_eventtab (void)
+{
+    int i;
+
+    currcycle = 0;
+    for (i = 0; i < ev_max; i++) {
+	eventtab[i].active = 0;
+	eventtab[i].oldcycles = 0;
+    }
+
+    eventtab[ev_cia].handler = CIA_handler;
+//    eventtab[ev_hsync].handler = hsync_handler;
+//    eventtab[ev_hsync].evtime = HSYNCTIME + get_cycles ();
+//    eventtab[ev_hsync].active = 1;
+
+//    eventtab[ev_copper].handler = copper_handler;
+//    eventtab[ev_copper].active = 0;
+    eventtab[ev_blitter].handler = blitter_handler;
+    eventtab[ev_blitter].active = 0;
+//    eventtab[ev_disk].handler = DISK_handler;
+//    eventtab[ev_disk].active = 0;
+//    eventtab[ev_audio].handler = audio_evhandler;
+//    eventtab[ev_audio].active = 0;
+    events_schedule ();
+}
+
+

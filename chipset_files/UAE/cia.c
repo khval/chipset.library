@@ -174,7 +174,7 @@ static void CIA_update(void) // used by cia_handler
 	Printf("ciaaicr bit 1 is true\n");
 
 	ciaaicr |= 1; 
-	Delay(1);
+
 	RethinkICRA();
 	ciaata = ciaala;					// reset timer
 	if (ciaacra & 0x8) ciaacra &= ~1;
@@ -194,6 +194,7 @@ static void CIA_update(void) // used by cia_handler
 	ciabtb = ciablb;					// reset timer
 	if (ciabcrb & 0x8) ciabcrb &= ~1;
     }
+
 }
 
 static void CIA_calctimers(void)
@@ -252,10 +253,13 @@ static void CIA_calctimers(void)
 	eventtab[ev_cia].evtime = ciatime + cycles;
     }
     events_schedule();
+
 }
 
 void CIA_handler(void)
 {
+	Printf("%s:%ld\n",__FUNCTION__,__LINE__);
+
 	cia_lock();
 	CIA_update();
 	CIA_calctimers();
@@ -275,24 +279,32 @@ void CIA_hsync_handler(void)
 {
 //    static unsigned int keytime = 0, sleepyhead = 0;
 
-    if (ciabtodon)
-	ciabtod++;
-    ciabtod &= 0xFFFFFF;
+	cia_lock();
 
-    if (ciabtod == ciabalarm) {
-	ciabicr |= 4; RethinkICRB();
-    }
+	if (ciabtodon) ciabtod++;
+	ciabtod &= 0xFFFFFF;
 
+	if (ciabtod == ciabalarm) 
+	{
+		ciabicr |= 4; RethinkICRB();
+	}
+
+	cia_unlock();
 }
 
 void CIA_vsync_handler(void)
 {
-    if (ciaatodon)
-	ciaatod++;
-    ciaatod &= 0xFFFFFF;
-    if (ciaatod == ciaaalarm) {
-	ciaaicr |= 4; RethinkICRA();
-    }
+	cia_lock();
+
+	if (ciaatodon) ciaatod++;
+	ciaatod &= 0xFFFFFF;
+
+	if (ciaatod == ciaaalarm)
+	{
+		ciaaicr |= 4; RethinkICRA();
+	}
+
+	cia_unlock();
 }
 
 ULONG _spyCIAA(unsigned int addr)
@@ -384,8 +396,11 @@ static uae_u8 ReadCIAA(unsigned int addr)
 	return ciaasdr;
      case 13:			// icr
 	cia_lock();
-	tmp = ciaaicr; ciaaicr = 0; RethinkICRA(); 
+	tmp = ciaaicr; 
+	ciaaicr = 0; 
+	RethinkICRA(); 
 	cia_unlock();
+
 	return tmp;
      case 14:			// cra
 	return ciaacra;
@@ -494,273 +509,333 @@ static uae_u8 ReadCIAB(unsigned int addr)
 
 void WriteCIAA(uae_u16 addr,uae_u8 val)
 {
-    int oldled, oldovl;
-	cia_lock();
+	int oldled, oldovl;
 
-    switch(addr & 0xf) {
-     case 0:					// pra
-	oldovl = ciaapra & 1;
-	oldled = ciaapra & 2;
-	ciaapra = (ciaapra & ~0x3) | (val & 0x3); 
-	gui_ledstate = 0;
-	if (!gui_ledstate_forced) {
-	  gui_ledstate = (~ciaapra & 2) >> 1;
-	} else {
-	  gui_ledstate = gui_ledstate_forced & 1;
-	}
-	/* we don't want to have ersatzkickfile or kickstart roms in uade */
-	/*
-	if ((ciaapra & 1) != oldovl) {
-	    map_banks(oldovl || ersatzkickfile ? &chipmem_bank : &kickmem_bank, 0, 32);
-	}
-	*/
-	break;
-     case 1:					// prb
-	ciaaprb = val;
-	if (prtopen==1) {
-#ifndef __DOS__
-	    fprintf (prttmp, "%c",val);
-#else
-	    fputc (val, prttmp);
-	    fflush (prttmp);
-#endif
-	    if (val==0x04) {
-#if defined(__unix) && !defined(__BEOS__) && !defined(__DOS__)
-		pclose (prttmp);
-#else
-		fclose (prttmp);
-#endif
-		prtopen = 0;
-	    }
-	} else {
-#if defined(__unix) && !defined(__BEOS__) && !defined(__DOS__)
-	  // prttmp = (FILE *)popen ((const char *)currprefs.prtname, "w");
-#else
-	  // prttmp = (FILE *)fopen ((const char *)currprefs.prtname, "wb");
-#endif
-	    prttmp = stderr;
-	    if (prttmp != NULL) {
-		prtopen = 1;
-#ifndef __DOS__
-		fprintf (prttmp,"%c",val);
-#else
-		fputc (val, prttmp);
-		fflush (prttmp);
-#endif
-	    }
-	}
-	ciaaicr |= 0x10;
-	break;
-     case 2:					// ddra
-	ciaadra = val; break;
-     case 3:					// ddrb
-	ciaadrb = val; break;
-     case 4:					// talo
-	CIA_update();
-	ciaala = (ciaala & 0xff00) | val;
-	CIA_calctimers();
-	break;
-     case 5:					// tahi
-	CIA_update();
-	ciaala = (ciaala & 0xff) | (val << 8);
-	if ((ciaacra & 1) == 0)
-	    ciaata = ciaala;
-	if (ciaacra & 8) {
-	    ciaata = ciaala;
-	    ciaacra |= 1;
-	}
-	CIA_calctimers();
-	break;
-     case 6:					// tblo
-	CIA_update();
-	ciaalb = (ciaalb & 0xff00) | val;
-	CIA_calctimers();
-	break;
-     case 7:					// tbhi
-	CIA_update();
-	ciaalb = (ciaalb & 0xff) | (val << 8);
-	if ((ciaacrb & 1) == 0)
-	    ciaatb = ciaalb;
-	if (ciaacrb & 8) {
-	    ciaatb = ciaalb;
-	    ciaacrb |= 1;
-	}
-	CIA_calctimers();
-	break;
-     case 8:					// todlo
-	if (ciaacrb & 0x80) {
-	    ciaaalarm = (ciaaalarm & ~0xff) | val;
-	} else {
-	    ciaatod = (ciaatod & ~0xff) | val;
-	    ciaatodon = 1;
-	}
-	break;
-     case 9:					// todmid
-	if (ciaacrb & 0x80) {
-	    ciaaalarm = (ciaaalarm & ~0xff00) | (val << 8);
-	} else {
-	    ciaatod = (ciaatod & ~0xff00) | (val << 8);
-	    ciaatodon = 0;
-	}
-	break;
-     case 10:				// todhi
-	if (ciaacrb & 0x80) {
-	    ciaaalarm = (ciaaalarm & ~0xff0000) | (val << 16);
-	} else {
-	    ciaatod = (ciaatod & ~0xff0000) | (val << 16);
-	    ciaatodon = 0;
-	}
-	break;
-     case 12:				// sdr
-	ciaasdr = val; break;
-     case 13:				// icr
-	setclr(&ciaaimask,val); break; /* ??? call RethinkICR() ? */
-     case 14:				// cra
-	CIA_update();
-	ciaacra = val;
-	if (ciaacra & 0x10) {
-	    ciaacra &= ~0x10;
-	    ciaata = ciaala;
-	}
-	if (ciaacra & 0x40) {
-	    kback = 1;
-	}
-	CIA_calctimers();
-	break;
-     case 15:				// crb
-	CIA_update();
-	ciaacrb = val;
-	if (ciaacrb & 0x10) {
-	    ciaacrb &= ~0x10;
-	    ciaatb = ciaalb;
-	}
-	CIA_calctimers();
-	break;
-    }
+	Printf("WriteCIAA( %08lx)\n", addr);
 
-	cia_unlock();
+	switch(addr & 0xf)
+	{
+		case 0:					// pra
+			oldovl = ciaapra & 1;
+			oldled = ciaapra & 2;
+
+			// bit 6 mouse, we allow setting mouse in chipset.library, as way to control programs.
+
+			ciaapra = (ciaapra & ~(1<<6 | 0x3)) | (val & (1<<6 | 0x3)); 
+
+			break;
+
+		case 1:					// prb
+			ciaaprb = val;
+
+			if (prtopen==1)
+			{
+#ifndef __DOS__
+				fprintf (prttmp, "%c",val);
+#else
+				fputc (val, prttmp);
+				fflush (prttmp);
+#endif
+				if (val==0x04)
+				{
+#if defined(__unix) && !defined(__BEOS__) && !defined(__DOS__)
+					pclose (prttmp);
+#else
+					fclose (prttmp);
+#endif
+					prtopen = 0;
+				}
+			}
+			else
+			{
+#if defined(__unix) && !defined(__BEOS__) && !defined(__DOS__)
+
+				// prttmp = (FILE *)popen ((const char *)currprefs.prtname, "w");
+#else
+				// prttmp = (FILE *)fopen ((const char *)currprefs.prtname, "wb");
+#endif
+				prttmp = stderr;
+				if (prttmp != NULL)
+				{
+					prtopen = 1;
+#ifndef __DOS__
+					fprintf (prttmp,"%c",val);
+#else
+					fputc (val, prttmp);
+					fflush (prttmp);
+#endif
+				}
+			}
+			cia_lock();
+			ciaaicr |= 0x10;
+			cia_unlock();
+			break;
+		case 2:					// ddra
+			ciaadra = val; break;
+		case 3:					// ddrb
+			ciaadrb = val; break;
+		case 4:					// talo
+			cia_lock();
+
+			CIA_update();
+			ciaala = (ciaala & 0xff00) | val;
+			CIA_calctimers();
+			cia_unlock();
+
+			break;
+		case 5:					// tahi
+
+			cia_lock();
+			CIA_update();
+			ciaala = (ciaala & 0xff) | (val << 8);
+
+			if ((ciaacra & 1) == 0)ciaata = ciaala;
+
+			if (ciaacra & 8)
+			{
+				ciaata = ciaala;
+				ciaacra |= 1;
+			}
+			CIA_calctimers();
+			cia_unlock();
+
+			break;
+		case 6:					// tblo
+			cia_lock();
+			CIA_update();
+			ciaalb = (ciaalb & 0xff00) | val;
+			CIA_calctimers();
+			cia_unlock();
+			break;
+		case 7:					// tbhi
+
+			cia_lock();
+			CIA_update();
+			ciaalb = (ciaalb & 0xff) | (val << 8);
+
+			if ((ciaacrb & 1) == 0) ciaatb = ciaalb;
+
+			if (ciaacrb & 8)
+			{
+				ciaatb = ciaalb;
+				ciaacrb |= 1;
+			}
+			CIA_calctimers();
+			cia_unlock();
+
+			break;
+		case 8:					// todlo
+			cia_lock();
+			if (ciaacrb & 0x80)
+			{
+				ciaaalarm = (ciaaalarm & ~0xff) | val;
+			}
+			else
+			{
+				ciaatod = (ciaatod & ~0xff) | val;
+				ciaatodon = 1;
+			}
+			cia_unlock();
+			break;
+		case 9:					// todmid
+			cia_lock();
+			if (ciaacrb & 0x80)
+			{
+				ciaaalarm = (ciaaalarm & ~0xff00) | (val << 8);
+			}
+			else
+			{
+				ciaatod = (ciaatod & ~0xff00) | (val << 8);
+				ciaatodon = 0;
+			}
+			cia_unlock();
+			break;
+		case 10:				// todhi
+			cia_lock();
+			if (ciaacrb & 0x80) {
+				ciaaalarm = (ciaaalarm & ~0xff0000) | (val << 16);
+			} else {
+				ciaatod = (ciaatod & ~0xff0000) | (val << 16);
+				ciaatodon = 0;
+			}
+			cia_unlock();
+			break;
+		case 12:				// sdr
+			ciaasdr = val; break;
+		case 13:				// icr
+			setclr(&ciaaimask,val); break; /* ??? call RethinkICR() ? */
+		case 14:				// cra
+			cia_lock();
+			CIA_update();
+			ciaacra = val;
+			if (ciaacra & 0x10)
+			{
+				ciaacra &= ~0x10;
+				ciaata = ciaala;
+			}
+			if (ciaacra & 0x40)
+			{
+				kback = 1;
+			}
+			CIA_calctimers();
+			cia_unlock();
+			break;
+		case 15:				// crb
+			cia_lock();
+			CIA_update();
+			ciaacrb = val;
+			if (ciaacrb & 0x10)
+			{
+				ciaacrb &= ~0x10;
+				ciaatb = ciaalb;
+			}
+			CIA_calctimers();
+			cia_unlock();
+			break;
+	}
 }
 
 void WriteCIAB(uae_u16 addr,uae_u8 val)
 {
-	cia_lock();
-
-    switch(addr & 0xf) {
+	switch(addr & 0xf)
+	{
      case 0:					// pra
-        ciabpra  = val;
-	break;
+		ciabpra  = val;	break;
      case 1:					// prb
-	ciabprb = val; break;
+		ciabprb = val; break;
      case 2:					// ddra
-	ciabdra = val; break;
+		ciabdra = val; break;
      case 3:					// ddrb
-	ciabdrb = val; break;
+		ciabdrb = val; break;
      case 4:					// talo
-	CIA_update();
-	ciabla = (ciabla & 0xff00) | val;
-	CIA_calctimers();
-	break;
+		cia_lock();
+		CIA_update();
+		ciabla = (ciabla & 0xff00) | val;
+		CIA_calctimers();
+		cia_unlock();	
+		break;
      case 5:					// tahi
-	CIA_update();
-	ciabla = (ciabla & 0xff) | (val << 8);
-	if ((ciabcra & 1) == 0)
-	    ciabta = ciabla;
-	if (ciabcra & 8) {
-	    ciabta = ciabla;
-	    ciabcra |= 1;
-	}
-	CIA_calctimers();
-	break;
-     case 6:					//  tblo
-	CIA_update();
-	ciablb = (ciablb & 0xff00) | val;
-	CIA_calctimers();
-	break;
-     case 7:					// tbhi
-	CIA_update();
-	ciablb = (ciablb & 0xff) | (val << 8);
-	if ((ciabcrb & 1) == 0)
-	    ciabtb = ciablb;
-	if (ciabcrb & 8) {
-	    ciabtb = ciablb;
-	    ciabcrb |= 1;
-	}
-	CIA_calctimers();
-	break;
-     case 8:					// todlo
-	if (ciabcrb & 0x80) {
-	    ciabalarm = (ciabalarm & ~0xff) | val;
-	} else {
-	    ciabtod = (ciabtod & ~0xff) | val;
-	    ciabtodon = 1;
-	}
-	break;
-     case 9:					// todmid
-	if (ciabcrb & 0x80) {
-	    ciabalarm = (ciabalarm & ~0xff00) | (val << 8);
-	} else {
-	    ciabtod = (ciabtod & ~0xff00) | (val << 8);
-	    ciabtodon = 0;
-	}
-	break;
-     case 10:				// todhi
-	if (ciabcrb & 0x80) {
-	    ciabalarm = (ciabalarm & ~0xff0000) | (val << 16);
-	} else {
-	    ciabtod = (ciabtod & ~0xff0000) | (val << 16);
-	    ciabtodon = 0;
-	}
-	break;
-     case 12:				// sdr
-	ciabsdr = val;
-	break;
-     case 13:				// lcr
-	setclr(&ciabimask,val);
-	break;
-     case 14:				// cra
-	CIA_update();
-	ciabcra = val;
-	if (ciabcra & 0x10) {
-	    ciabcra &= ~0x10;
-	    ciabta = ciabla;
-	}
-	CIA_calctimers();
-	break;
-     case 15:				// crb
-	CIA_update();
-	ciabcrb = val;
-	if (ciabcrb & 0x10) {
-	    ciabcrb &= ~0x10;
-	    ciabtb = ciablb;
-	}
-	CIA_calctimers();
-	break;
-    }
 
-	cia_unlock();
+		cia_lock();
+		CIA_update();
+		ciabla = (ciabla & 0xff) | (val << 8);
+
+		if ((ciabcra & 1) == 0) ciabta = ciabla;
+
+		if (ciabcra & 8)
+		{
+			ciabta = ciabla;
+			ciabcra |= 1;
+		}
+		CIA_calctimers();
+		cia_unlock();
+
+		break;
+     case 6:					//  tblo
+		cia_lock();
+		CIA_update();
+		ciablb = (ciablb & 0xff00) | val;
+		CIA_calctimers();
+		cia_unlock();
+		break;
+     case 7:					// tbhi
+		cia_lock();
+		CIA_update();
+		ciablb = (ciablb & 0xff) | (val << 8);
+
+		if ((ciabcrb & 1) == 0) ciabtb = ciablb;
+
+		if (ciabcrb & 8) 
+		{
+			ciabtb = ciablb;
+			ciabcrb |= 1;
+		}
+		CIA_calctimers();
+		cia_unlock();
+		break;
+     case 8:					// todlo
+		cia_lock();
+		if (ciabcrb & 0x80)
+		{
+			ciabalarm = (ciabalarm & ~0xff) | val;
+		}
+		else
+		{
+			ciabtod = (ciabtod & ~0xff) | val;
+			ciabtodon = 1;
+		}
+		cia_unlock();
+		break;
+     case 9:					// todmid
+		cia_lock();
+		if (ciabcrb & 0x80) {
+		    ciabalarm = (ciabalarm & ~0xff00) | (val << 8);
+		} else {
+		    ciabtod = (ciabtod & ~0xff00) | (val << 8);
+		    ciabtodon = 0;
+		}
+		cia_unlock();
+		break;
+     case 10:				// todhi
+		cia_lock();
+		if (ciabcrb & 0x80) {
+			ciabalarm = (ciabalarm & ~0xff0000) | (val << 16);
+		} else {
+			ciabtod = (ciabtod & ~0xff0000) | (val << 16);
+			ciabtodon = 0;
+		}
+		cia_unlock();
+		break;
+     case 12:				// sdr
+		ciabsdr = val;
+		break;
+     case 13:				// lcr
+		setclr(&ciabimask,val);
+		break;
+     case 14:				// cra
+		cia_lock();
+		CIA_update();
+		ciabcra = val;
+		if (ciabcra & 0x10) {
+			ciabcra &= ~0x10;
+			ciabta = ciabla;
+		}
+		CIA_calctimers();
+		cia_unlock();
+		break;
+     case 15:				// crb
+		cia_lock();
+		CIA_update();
+		ciabcrb = val;
+		if (ciabcrb & 0x10) 
+		{
+			ciabcrb &= ~0x10;
+			ciabtb = ciablb;
+		}
+		CIA_calctimers();
+		cia_unlock();
+		break;
+	}
 }
 
 void CIA_reset(void)
 {
-    kback = 1;
-    kbstate = 0;
+	cia_lock();
 
-    ciaatlatch = ciabtlatch = 0;
-    ciaapra = 3;
-    ciaatod = ciabtod = 0; ciaatodon = ciabtodon = 0;
-    ciaaicr = ciabicr = ciaaimask = ciabimask = 0;
-    ciaacra = ciaacrb = ciabcra = ciabcrb = 0x4; /* outmode = toggle; */
-    ciaala = ciaalb = ciabla = ciablb = ciaata = ciaatb = ciabta = ciabtb = 0xFFFF;
-    div10 = 0;
-    lastdiv10 = 0;
-    CIA_calctimers();
-    ciabpra = 0x8C;
+	kback = 1;
+	kbstate = 0;
+	ciaatlatch = ciabtlatch = 0;
+	ciaapra = 3;
+	ciaatod = ciabtod = 0; ciaatodon = ciabtodon = 0;
+	ciaaicr = ciabicr = ciaaimask = ciabimask = 0;
+	ciaacra = ciaacrb = ciabcra = ciabcrb = 0x4; /* outmode = toggle; */
+	ciaala = ciaalb = ciabla = ciablb = ciaata = ciaatb = ciabta = ciabtb = 0xFFFF;
+	div10 = 0;
+	lastdiv10 = 0;
+	CIA_calctimers();
+	ciabpra = 0x8C;
 
-    /* we don't want ersatzkick or kickstart roms in uade */
-    /*
-      if (! ersatzkickfile)
-      map_banks(&kickmem_bank, 0, 32);
-    */
+	cia_unlock();
 }
 
 void dumpcia(void)
@@ -897,3 +972,5 @@ static void REGPARAM2 clock_bput (uaecptr addr, uae_u32 value)
      case 0x3f: clock_control_f=value; break;
     }
 }
+
+

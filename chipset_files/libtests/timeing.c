@@ -14,6 +14,11 @@
 struct chipsetIFace * Ichipset = NULL;
 struct Library *chipsetBase = NULL;
 
+struct IntuitionIFace * IIntuition = NULL;
+struct Library *IntuitionBase = NULL;
+
+struct GraphicsIFace * IGraphics = NULL;
+struct Library *GraphicsBase = NULL;
 /*
 ;
 ; 8520_timing.asm
@@ -109,21 +114,18 @@ TIME    equ     2148
 ;
 ;----Wait for the timer to count down
 */
-	printf("Led at %08x\n",&(_ciaa ->ciacra));
-
-
-	// we need to close this program safe, and the library safe
-	writeChipByte(0x00000000,0x00);	// first 1024 bytes in chip ram, can be used for something, address 0 is normally allocation failed anyway.
 
 	for (;;)        // busy wait
 	{
-		if (readChipByte(0x00000000) == 0xFF) break;
+		if (readChipByte(0xBFE001) & 1L<<6)  break;		// wait for left mouse button
+
 		icr = readChipByte(&(_ciaa ->ciaicr));
 		if ((1&icr)==0) continue;                        // Wait for timer expired flag
 
 		bitChgChipByte(&(_ciaa ->ciapra),CIAB_LED);     // blink light
 		bitSetChipByte(&(_ciaa ->ciacra),0);             // Restart timer
 
+//		getchar();
         }
 
 /*

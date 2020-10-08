@@ -24,6 +24,8 @@
 // #include "newcpu.h"
 #include "blitter.h"
 
+#include <proto/dos.h>
+
 #define STATIC_INLINE static inline
 
 #include "blit.h"
@@ -456,17 +458,25 @@ static void actually_do_blit (void)
 
 void blitter_handler (void)
 {
-    if (!dmaen(DMA_BLITTER)) {
-	eventtab[ev_blitter].active = 1;
-	eventtab[ev_blitter].oldcycles = get_cycles ();
-	eventtab[ev_blitter].evtime = 10 * CYCLE_UNIT + get_cycles (); /* wait a little */
-	return; /* gotta come back later. */
-    }
-    actually_do_blit ();
+	Printf("%s:%d\n",__FUNCTION__,__LINE__);
 
-    INTREQ(0x8040);
-    eventtab[ev_blitter].active = 0;
-    unset_special (SPCFLAG_BLTNASTY);
+	if (!dmaen(DMA_BLITTER))
+	{
+		Printf("%s:%d - 	if (!dmaen(DMA_BLITTER))\n",__FUNCTION__,__LINE__);
+
+		eventtab[ev_blitter].active = 1;
+		eventtab[ev_blitter].oldcycles = get_cycles ();
+		eventtab[ev_blitter].evtime = 10 * CYCLE_UNIT + get_cycles (); /* wait a little */
+		return; /* gotta come back later. */
+	}
+
+	Printf("%s:%d - actually_do_blit()\n",__FUNCTION__,__LINE__);
+
+	actually_do_blit ();
+
+	INTREQ(0x8040);
+	eventtab[ev_blitter].active = 0;
+	unset_special (SPCFLAG_BLTNASTY);
 }
 
 static long int blit_cycles;

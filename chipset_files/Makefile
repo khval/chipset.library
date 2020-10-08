@@ -48,7 +48,8 @@ nallePuh_srcs = NallePUH/src/Nalle.c \
 uae_srcs = uae/memory.c \
 		uae/cia.c \
 		uae/blitter.c \
-		uae/custom_mini.c
+		uae/custom_mini.c \
+		uae/events.c
 
 # "main" Interface Source Files
 main_SRCS = main/Obtain.c main/Release.c main/allocChip.c main/freeChip.c \

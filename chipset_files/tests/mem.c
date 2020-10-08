@@ -23,12 +23,14 @@
 #include <stdio.h>
 #include "../micro_sys/memory.h"
 
-#include "../uade/sysconfig.h"
-#include "../uade/sysdeps.h"
-#include "../uade/memory.h"
+#include "../uae/sysconfig.h"
+#include "../uae/sysdeps.h"
+#include "../uae/memory.h"
 
 
 uae_u8 *chipmemory;
+ uae_u32 chipmem_mask;
+
 
 void dump_blocks()
 {

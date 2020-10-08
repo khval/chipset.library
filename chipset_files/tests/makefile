@@ -4,8 +4,8 @@ inc = -I../uade -I../ -I./
 files = cia.exe cia2.exe mem.exe
 
 deps =
-deps_cia = ../uade/cia.o ../uade/memory.o
-deps_cia2 = ../uade/cia.o ../uade/memory.o ../timer_device.o
+deps_cia = ../lock.o ../uae/cia.o ../uae/memory.o ../uae/events.o
+deps_cia2 = ../lock.o ../uae/cia.o ../uae/memory.o ../uae/events.o ../timer_device.o
 deps_mem = ../micro_sys/memory.o
 
 all: $(deps)  $(files)

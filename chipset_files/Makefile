@@ -81,6 +81,7 @@ main_SRCS = main/Obtain.c main/Release.c main/allocChip.c main/freeChip.c \
 	mem_api.c \
 	68k_stubs.c \
 	ahi_prefs.c \
+	lock.c \
 	/RAM/t/blit_table.c \
 	/RAM/t/blitfunc.c
 

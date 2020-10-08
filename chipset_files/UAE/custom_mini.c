@@ -342,12 +342,20 @@ uae_u32 DENISEID()
 	return 0xFFFF;
 }
 
+
+uae_u16 DMACONR (void)
+{
+    return ( pd->m_DMACON | (bltstate==BLT_done ? 0 : 0x4000)
+	    | (blt_info.blitzero ? 0x2000 : 0));
+}
+
 uae_u32 REGPARAM2 custom_wget (uaecptr addr )
 {
 	uae_u16 v;
 	switch (addr & 0x1FE)
 	{
-//		case 0x002: v = DMACONR (); break;
+		case 0x002: v = DMACONR (); break;		// DAM control ( and blitter status) read
+
 //		case 0x004: v = VPOSR (); break;
 //		case 0x006: v = VHPOSR (); break;
 //		case 0x008: v = DSKDATR (current_hpos ()); break;

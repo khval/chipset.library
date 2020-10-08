@@ -15,8 +15,9 @@ extern uae_u8 *chipmemory ;
 
 extern bool init_mem();
 extern void cleanup_mem();
-
 extern addrbank nallePuh_bank ;
+
+extern void init_eventtab (void);
 
 BOOL setup_mem_banks()
 {
@@ -30,6 +31,7 @@ BOOL setup_mem_banks()
 	if (init_mem()==FALSE) return FALSE;
 
 	CIA_reset();
+	init_eventtab();
 
 	return TRUE;
 }

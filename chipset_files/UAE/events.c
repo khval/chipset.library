@@ -10,10 +10,13 @@
 
 #include <proto/dos.h>
 
+extern void event_lock();
+extern void event_unlock();
+
 void events_schedule (void)
 {
-	uint16_t mintime = ~0L;
-	unsigned long int eventtime;
+	uint32_t mintime = ~0L;
+	uint32_t eventtime;
 
 	event_lock();
 
@@ -58,92 +61,53 @@ void events_schedule (void)
 		eventtime = eventtab[ev_blitter].evtime - cycles;
 		if (eventtime < mintime) 
 		{
-			Printf("mintime use blitter %ld < %ld\n", eventtime, mintime );
+			Printf("mintime use blitter %08lx < %08lx\n", eventtime, mintime );
 			mintime = eventtime;
 		}
 	}
 
 	nextevent = mintime + cycles;
-	Printf("nextevent %ld\n", nextevent );
+
+	printf("nextevent %08x\n", nextevent );
 
 	event_unlock();
 }
 
 void do_cycles_slow (uint32_t cycles_to_add)
 {
-	int delta_nextevent = 0;
+	uint32_t delta_nextevent = 0;
 
 	if (cycles_to_add == 0) return;
 
 	event_lock();
-
 	delta_nextevent = nextevent - cycles;
 
-	if (~0L != delta_nextevent)
-	{
-		Printf("%s:%ld --  nextevent  %ld -  cycles_to_add: %ld\n",__FUNCTION__,__LINE__, nextevent , cycles_to_add);
-		Printf("hsync: %s, cia: %s: blitter: %s\n",
-			eventtab[ev_hsync].active ? "active" : "disabled",
-			eventtab[ev_cia].active ? "active" : "disabled",
-			eventtab[ev_blitter].active ? "active" : "disabled");
-	}
-
-	if (cycles_to_add >= delta_nextevent )
+	if (cycles_to_add > delta_nextevent )
 	{ 
+
 		cycles_to_add -= delta_nextevent;
 		cycles += delta_nextevent;
-		delta_nextevent = 0;
-	}
-	else 
-	{
-		delta_nextevent -= cycles_to_add;
-	}
-
-	if (delta_nextevent == 0)
-	{
-		Printf("We got something to do\n{\n");
 
 		/* HSYNC */
 		if(eventtab[ev_hsync].active && eventtab[ev_hsync].evtime == cycles)
 		{
-			Printf("Do HSYNC\n");
-
 			(*eventtab[ev_hsync].handler)();
 		}
-
-		/* AUDIO */
-#if 0
-		if(eventtab[ev_audio].active && eventtab[ev_audio].evtime == cycles)
-		{
-			(*eventtab[ev_audio].handler)();
-		}
-#endif
 
 		/* CIA */
 		if(eventtab[ev_cia].active && eventtab[ev_cia].evtime == cycles)
 		{
-			Printf("Do CIA\n");
-
 			(*eventtab[ev_cia].handler)();
 		}
-
-		Printf("eventtab[ev_blitter].evtime: %ld == cycles: %ld\n", eventtab[ev_blitter].evtime , cycles);
 
 		/* blitter */
 		if(eventtab[ev_blitter].active && eventtab[ev_blitter].evtime == cycles)
 		{
-			Printf("Do bliter\n");
 			(*eventtab[ev_blitter].handler)();
 		}
-			
-		Printf("}\n");
-
-		Delay(5);
 	}
 
-
 	cycles += cycles_to_add;
-
 	event_unlock();
 
 	events_schedule();

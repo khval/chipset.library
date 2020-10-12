@@ -60,9 +60,8 @@ char *screen = NULL;
 
 bool init_screen()
 {
-
 	screen_bytes = Screenwidth/8 * Screenheigh;
-	screen = malloc( screen_bytes );	// create a tmp screen !!!
+	screen = (char *) allocChip( screen_bytes );	// create a tmp screen !!!
 	if (screen == NULL) return false;
 	bzero( screen, screen_bytes );
 	return true;
@@ -70,7 +69,7 @@ bool init_screen()
 
 void free_screen()
 {
-	if (screen) free(screen);
+	if (screen) freeChip(screen);
 	screen = NULL;
 }
 
@@ -79,23 +78,22 @@ void blit(int spriteWidth, int spriteHeight, char * sprite)
 	// setup data
 
 	int byteoffset = 0;
-	int blitw = spriteWidth / 16;
-	int blith = spriteHeight;
+	int blith = spriteWidth / 16;
+	int blitv = spriteHeight;
 
 	struct Custom *a6 = 0xDFF000;
 
 	// test blitter
 
-	writeChipLong( &(a6 -> bltcon0), 0x09F0000000);			// Copy A->D, no shifts, ascending mode
+	writeChipLong( &(a6 -> bltcon0), 0x09F00000);			// Copy A->D, no shifts, ascending mode
 	writeChipLong( &(a6 -> bltafwm), 0xFFFFFFFFFFF);			// no mask of first/last word
-	writeChipWord( &(a6 -> bltcon0), 0);					// A modulo = bytes to skip between lines
-	writeChipWord( &(a6 -> bltdmod), Screenwidth / 8 - blitw*2 ) ;	// D Modulo
+	writeChipWord( &(a6 -> bltamod), 0);					// A modulo = bytes to skip between lines
+	writeChipWord( &(a6 -> bltdmod), Screenwidth / 8 - blith*2 ) ;	// D Modulo
 	writeChipLong( &(a6 -> bltapt), sprite);					// source top left corner
 	writeChipLong( &(a6 -> bltdpt), screen + byteoffset);		// destination top left corner
-	writeChipWord( &(a6 -> bltsize), blith*64+blitw);			// rectangle size, starts blit
+	writeChipWord( &(a6 -> bltsize), blitv*64+blith);			// rectangle size, starts blit
 	
 }
-
 
 BOOL openWin()
 {
@@ -169,25 +167,27 @@ void byteToPixels( char c, int x, int y)
 void strToBin( char **array, char *to, int size )
 {
 	char *c;
-
 	while (size--)
 	{
 		*to = 0;
-		for (c=array[0];*c;c++) 
+		for (c=array[0];(*c);c++) 
 		{
 			*to<<=1;
 			*to|= (*c=='1') ? 1: 0;
 		}
-
 		to++;
 		array++;
 	}
 }
 
-int main()
+int spriteWidth = 16;
+int spriteHeight = 0;
+char *sprite = NULL;
+
+void make_sprite()
 {
-	int spriteWidth = 16;
-	int spriteHeight = 0;
+	int spriteSize;
+
 	char *spriteC[]= {
 			 "00000000","00000000",
 			 "00000111","11000000",
@@ -203,14 +203,16 @@ int main()
 			 "00000110","01100000",
 		};
 
-	char sprite[sizeof(spriteC)/sizeof(char *) ];
+	spriteSize = sizeof(spriteC)/sizeof(char *);	
 
-	spriteHeight = sizeof(sprite) / (spriteWidth / 8);
+	sprite = (char *) allocChip( spriteSize );
+	bzero( sprite , sizeof( spriteSize ));
+	spriteHeight = sizeof(spriteC) / (spriteWidth / 2) ;
+	strToBin( spriteC, sprite, spriteSize );
+}
 
-	printf("sprite %d,%d\n",spriteWidth,spriteHeight);
-
-	strToBin( spriteC, sprite, sizeof(sprite) );
-
+int main()
+{
 
 	if (init() == FALSE)
 	{
@@ -224,8 +226,13 @@ int main()
 		return 0;
 	}
 
+	make_sprite();
+
 	if (init_screen())
 	{
+		printf("sprite adr: %08x\n",sprite);
+		printf("screen adr: %08x\n",screen);
+
 		blit( spriteWidth,  spriteHeight, sprite);
 
 		do
@@ -237,6 +244,9 @@ int main()
 			paper ^= 0x070707;
 		} while ( running);
 	}
+
+
+	if (sprite) freeChip( sprite );
 
 	free_screen();
 

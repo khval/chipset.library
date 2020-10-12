@@ -126,18 +126,25 @@ static void blitter_dofast (void)
 	bltcdatptr = bltcpt;
 	bltcpt += (blt_info.hblitsize*2 + blt_info.bltcmod)*blt_info.vblitsize;
     }
-    if (bltcon0 & 0x100) {
-	bltddatptr = bltdpt;
-	bltdpt += (blt_info.hblitsize*2 + blt_info.bltdmod)*blt_info.vblitsize;
-    }
 
-    if (blitfunc_dofast[mt] && !blitfill)
-	(*blitfunc_dofast[mt])(bltadatptr, bltbdatptr, bltcdatptr, bltddatptr, &blt_info);
-    else {
-	uae_u32 blitbhold = blt_info.bltbhold;
-	uae_u32 preva = 0, prevb = 0;
-	uaecptr dstp = 0;
-	int dodst = 0;
+	if (bltcon0 & 0x100)
+	{
+		bltddatptr = bltdpt;
+		bltdpt += (blt_info.hblitsize*2 + blt_info.bltdmod)*blt_info.vblitsize;
+	}
+
+
+	if (blitfunc_dofast[mt] && !blitfill)
+	{
+
+		(*blitfunc_dofast[mt])(bltadatptr, bltbdatptr, bltcdatptr, bltddatptr, &blt_info);
+	}
+	else
+	{
+		uae_u32 blitbhold = blt_info.bltbhold;
+		uae_u32 preva = 0, prevb = 0;
+		uaecptr dstp = 0;
+		int dodst = 0;
 
 	/*if (!blitfill) write_log ("minterm %x not present\n",mt); */
 	for (j = 0; j < blt_info.vblitsize; j++) {

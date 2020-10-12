@@ -207,12 +207,15 @@ struct PUHData*AllocPUH( void )
 				pd->m_ChipFreq = 3546895;
 			}
 
-			pd->m_DMACON							 = DMAF_MASTER;
-			pd->m_INTENA							 = INTF_INTEN;
+			pd->m_DMACON					= DMAF_MASTER;	// 0x200 
+
+			pd -> m_DMACON					|= DMAF_BLITTER;	// enable blitter.
+
+			pd->m_INTENA						= INTF_INTEN;
 
 			pd->m_Intercepted					= (void*) 0xdff000;
-			pd->m_CustomDirect				 = (void*) 0xdff000;
-			pd->m_CustomSize					 = 0x200;
+			pd->m_CustomDirect				= (void*) 0xdff000;
+			pd->m_CustomSize					= 0x200;
 
 			pd->m_SoftInt.is_Node.ln_Type = NT_EXTINTERRUPT;
 			pd->m_SoftInt.is_Node.ln_Pri	= 32;

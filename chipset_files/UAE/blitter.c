@@ -458,11 +458,11 @@ static void actually_do_blit (void)
 
 void blitter_handler (void)
 {
-	Printf("%s:%d\n",__FUNCTION__,__LINE__);
+	Printf("%s:%s:%ld\n",__FILE__,__FUNCTION__,__LINE__);
 
 	if (!dmaen(DMA_BLITTER))
 	{
-		Printf("%s:%d - 	if (!dmaen(DMA_BLITTER))\n",__FUNCTION__,__LINE__);
+		Printf("%s:%s:%ld - 	if (!dmaen(DMA_BLITTER))\n",__FILE__,__FUNCTION__,__LINE__);
 
 		eventtab[ev_blitter].active = 1;
 		eventtab[ev_blitter].oldcycles = get_cycles ();
@@ -470,7 +470,7 @@ void blitter_handler (void)
 		return; /* gotta come back later. */
 	}
 
-	Printf("%s:%d - actually_do_blit()\n",__FUNCTION__,__LINE__);
+	Printf("%s:%s:%ld - actually_do_blit()\n",__FILE__,__FUNCTION__,__LINE__);
 
 	actually_do_blit ();
 

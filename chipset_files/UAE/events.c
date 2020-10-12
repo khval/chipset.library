@@ -68,7 +68,7 @@ void events_schedule (void)
 
 	nextevent = mintime + cycles;
 
-	printf("nextevent %08x\n", nextevent );
+//	Printf("nextevent %08lx\n", nextevent );
 
 	event_unlock();
 }

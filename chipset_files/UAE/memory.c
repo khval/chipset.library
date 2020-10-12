@@ -158,7 +158,7 @@ uae_u32 REGPARAM2 chipmem_lget (uaecptr addr)
 {
 	uae_u32 *m;
 	addr -= chipmem_start & chipmem_mask;
-	addr &= chipmem_mask;
+//	addr &= chipmem_mask;
 	m = (uae_u32 *)(chipmemory + addr);
 	return do_get_mem_long (m);
 }
@@ -167,7 +167,7 @@ uae_u32 REGPARAM2 chipmem_wget (uaecptr addr)
 {
 	uae_u16 *m;
 	addr -= chipmem_start & chipmem_mask;
-	addr &= chipmem_mask;
+//	addr &= chipmem_mask;
 	m = (uae_u16 *)(chipmemory + addr);
 	return do_get_mem_word (m);
 }
@@ -175,7 +175,7 @@ uae_u32 REGPARAM2 chipmem_wget (uaecptr addr)
 uae_u32 REGPARAM2 chipmem_bget (uaecptr addr)
 {
 	addr -= chipmem_start & chipmem_mask;
-	addr &= chipmem_mask;
+//	addr &= chipmem_mask;
 	return chipmemory[addr];
 }
 
@@ -183,7 +183,7 @@ void REGPARAM2 chipmem_lput (uaecptr addr, uae_u32 l)
 {
 	uae_u32 *m;
 	addr -= chipmem_start & chipmem_mask;
-	addr &= chipmem_mask;
+//	addr &= chipmem_mask;
 	m = (uae_u32 *)(chipmemory + addr);
 	do_put_mem_long (m, l);
 }
@@ -192,7 +192,7 @@ void REGPARAM2 chipmem_wput (uaecptr addr, uae_u32 w)
 {
 	uae_u16 *m;
 	addr -= chipmem_start & chipmem_mask;
-	addr &= chipmem_mask;
+//	addr &= chipmem_mask;
 	m = (uae_u16 *)(chipmemory + addr);
 	do_put_mem_word (m, w);
 }
@@ -200,7 +200,7 @@ void REGPARAM2 chipmem_wput (uaecptr addr, uae_u32 w)
 void REGPARAM2 chipmem_bput (uaecptr addr, uae_u32 b)
 {
 	addr -= chipmem_start & chipmem_mask;
-	addr &= chipmem_mask;
+//	addr &= chipmem_mask;
 	chipmemory[addr] = b;
 }
 	
@@ -208,14 +208,14 @@ void REGPARAM2 chipmem_bput (uaecptr addr, uae_u32 b)
 int REGPARAM2 chipmem_check (uaecptr addr, uae_u32 size)
 {
 	addr -= chipmem_start & chipmem_mask;
-	addr &= chipmem_mask;
+//	addr &= chipmem_mask;
 	return (addr + size) <= allocated_chipmem;
 }
 
 uae_u8 REGPARAM2 *chipmem_xlate (uaecptr addr)
 {
 	addr -= chipmem_start & chipmem_mask;
-	addr &= chipmem_mask;
+//	addr &= chipmem_mask;
 	return chipmemory + addr;
 }
 

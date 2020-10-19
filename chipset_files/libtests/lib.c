@@ -8,6 +8,12 @@
 #define __USE_INLINE__
 #include <proto/chipset.h>
 
+extern struct IntuitionIFace * IIntuition;
+extern struct Library *IntuitionBase;
+
+extern struct GraphicsIFace * IGraphics;
+extern struct Library *GraphicsBase;
+
 extern struct chipsetIFace * Ichipset;
 extern struct Library *chipsetBase;
 
@@ -33,6 +39,8 @@ BOOL open_lib( const char *name, int ver , const char *iname, int iver, struct L
 BOOL init()
 {
 	if ( ! open_lib( "chipset.library", 53L , "main", 1, &chipsetBase, (struct Interface **) &Ichipset  ) ) return FALSE;
+	if ( ! open_lib( "intuition.library", 53L , "main", 1, &IntuitionBase, (struct Interface **) &IIntuition  ) ) return FALSE;
+	if ( ! open_lib( "graphics.library", 53L , "main", 1, &IntuitionBase, (struct Interface **) &IGraphics  ) ) return FALSE;
 	return TRUE;
 }
 
@@ -44,4 +52,6 @@ BOOL init()
 void close_libs()
 {
 	close_lib( chipsetBase, Ichipset );
+	close_lib( IntuitionBase, IIntuition );
+	close_lib( IntuitionBase, IGraphics );
 }

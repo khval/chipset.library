@@ -26,13 +26,17 @@
 #include "proto/exec.h"
 #include "proto/dos.h"
 
-#include "uade/cia.h"
-#include "uade/events.h"
+#include "uae/cia.h"
+#include "uae/events.h"
 
-unsigned long int cycles = 0;
+uint32_t cycles = 0;
 struct ev eventtab[ev_max];
-unsigned long int nextevent =0 ;
+uint32_t nextevent =0 ;
 int custom_bank = 0;
+
+BOOL lock_init();
+void lock_cleanup();
+
 
 //CIA_hsync_handler();
 //CIA_vsync_handler();
@@ -135,6 +139,12 @@ int main()
 	int count;
 	float delta_us = 0;
 
+	if (lock_init() == false)
+	{
+		lock_cleanup();
+		return 0;
+	}
+
 //	stderr = stdout;
 
 	init_timer_device();
@@ -188,7 +198,12 @@ int main()
 	stderr = stderr_backup;
 
 	close_timer_device();
+	lock_cleanup();
 
 	return 0;
 }
 
+void INTREQ_0(uint32_t xx)
+{
+
+}

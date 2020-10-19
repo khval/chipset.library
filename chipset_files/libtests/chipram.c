@@ -11,6 +11,12 @@
 struct chipsetIFace * Ichipset = NULL;
 struct Library *chipsetBase = NULL;
 
+struct IntuitionIFace * IIntuition = NULL;
+struct Library *IntuitionBase = NULL;
+
+struct GraphicsIFace * IGraphics = NULL;
+struct Library *GraphicsBase = NULL;
+
 int main()
 {
 	if (init())

@@ -3,15 +3,15 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include "uade/cia.h"
-#include "uade/events.h"
+#include "uae/cia.h"
+#include "uae/events.h"
 
 #define __USE_INLINE__
 
 #include <proto/exec.h>
 #include <proto/dos.h>
 
-uint16_t cycles = 0;
+uint32_t cycles = 0;
 struct ev eventtab[ev_max];
 uint32_t nextevent =0 ;
 int custom_bank = 0;
@@ -49,13 +49,17 @@ double _50Hz_period_us_cnt = 0;
 double hsync_period_us_cnt = 0;
 struct timeval start, end;
 
-void do_cia( float delta_us )
+void do_cia( uint32_t new_cycles, float delta_us )
 {
 	_50Hz_period_us_cnt += delta_us;
 	hsync_period_us_cnt += delta_us;
 
-	CIA_handler();	// this function process cpu cycles
+	do_cycles_slow ( new_cycles );
 
+//	CIA_handler();	// this function process cpu cycles
+
+// this part should be handled by events.
+/*
 	while (hsync_period_us_cnt >= hsync_period_us)
 	{
 		CIA_hsync_handler();
@@ -67,6 +71,7 @@ void do_cia( float delta_us )
 		CIA_vsync_handler();
 		_50Hz_period_us_cnt -= _50Hz_period_us;	// 20 ms.
 	}
+*/
 } 
 
 extern bool expunge_tasks;
@@ -95,7 +100,6 @@ void cia_process_fn ()
 {
 	uint32_t microseconds = 0;
 	uint16_t count;
-	uint16_t delta;
 
 	Printf("init timer.device...\n");
 
@@ -114,16 +118,9 @@ void cia_process_fn ()
 
 		// 1 cia time = 10 cpu cycles, (Amiga500)
 
-		delta = (10*count);	
-		cycles+=(10 *count);
-
-		Printf("do timer\n");
-
-		do_cia(cia_time_us * count);
+		do_cia( (10*count), cia_time_us * count);
 		start = end;
  
-//		Printf("libcount: %ld, expunge: %ld\n", ((struct Library *)libBase_debug)->lib_OpenCnt, expunge_tasks);
-
 	} while (  expunge_tasks == false );
 
 	Printf("trying to close\n");

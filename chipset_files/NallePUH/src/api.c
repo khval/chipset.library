@@ -18,8 +18,8 @@
 #define SIZEOF_SHORT 2
 #define SIZEOF_INT 4
 
-#include "uade/sysdeps.h"
-#include "uade/memory.h"
+#include "uae/sysdeps.h"
+#include "uae/memory.h"
 
 extern UWORD PUHRead( UWORD reg, BOOL *handled );
 extern void PUHWrite( UWORD reg, UWORD value, BOOL *handled );

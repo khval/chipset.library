@@ -2,9 +2,9 @@
 #include <exec/libraries.h>
 #include <exec/emulation.h>
 
-#include "uade/sysconfig.h"
-#include "uade/sysdeps.h"
-#include "uade/memory.h"
+#include "uae/sysconfig.h"
+#include "uae/sysdeps.h"
+#include "uae/memory.h"
 
 #define __USE_INLINE__
 

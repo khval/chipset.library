@@ -1,22 +1,22 @@
 /* $Id: PUH.c,v 1.17 2001/05/04 08:43:33 lcs Exp $ */
 
 /*
-     NallePUH -- Paula utan henne -- A minimal Paula emulator.
-     Copyright (C) 2001 Martin Blom <martin@blom.org>
-     
-     This program is free software; you can redistribute it and/or
-     modify it under the terms of the GNU General Public License
-     as published by the Free Software Foundation; either version 2
-     of the License, or (at your option) any later version.
-     
-     This program is distributed in the hope that it will be useful,
-     but WITHOUT ANY WARRANTY; without even the implied warranty of
-     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-     GNU General Public License for more details.
-     
-     You should have received a copy of the GNU General Public License
-     along with this program; if not, write to the Free Software
-     Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+		 NallePUH -- Paula utan henne -- A minimal Paula emulator.
+		 Copyright (C) 2001 Martin Blom <martin@blom.org>
+		 
+		 This program is free software; you can redistribute it and/or
+		 modify it under the terms of the GNU General Public License
+		 as published by the Free Software Foundation; either version 2
+		 of the License, or (at your option) any later version.
+		 
+		 This program is distributed in the hope that it will be useful,
+		 but WITHOUT ANY WARRANTY; without even the implied warranty of
+		 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	See the
+		 GNU General Public License for more details.
+		 
+		 You should have received a copy of the GNU General Public License
+		 along with this program; if not, write to the Free Software
+		 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
 
@@ -57,8 +57,8 @@
 #define SIZEOF_SHORT 2
 #define SIZEOF_INT 4
 
-#include "uade/sysdeps.h"
-#include "uade/memory.h"
+#include "uae/sysdeps.h"
+#include "uae/memory.h"
 
 
 #define INTF_AUDIO	 ( INTF_AUD3 | INTF_AUD2 | INTF_AUD1 | INTF_AUD0 )
@@ -207,12 +207,15 @@ struct PUHData*AllocPUH( void )
 				pd->m_ChipFreq = 3546895;
 			}
 
-			pd->m_DMACON							 = DMAF_MASTER;
-			pd->m_INTENA							 = INTF_INTEN;
+			pd->m_DMACON					= DMAF_MASTER;	// 0x200 
+
+			pd -> m_DMACON					|= DMAF_BLITTER;	// enable blitter.
+
+			pd->m_INTENA						= INTF_INTEN;
 
 			pd->m_Intercepted					= (void*) 0xdff000;
-			pd->m_CustomDirect				 = (void*) 0xdff000;
-			pd->m_CustomSize					 = 0x200;
+			pd->m_CustomDirect				= (void*) 0xdff000;
+			pd->m_CustomSize					= 0x200;
 
 			pd->m_SoftInt.is_Node.ln_Type = NT_EXTINTERRUPT;
 			pd->m_SoftInt.is_Node.ln_Pri	= 32;
@@ -456,6 +459,8 @@ static BOOL RestoreMemory( struct PUHData* pd )
 ** Handle reads ***************************************************************
 ******************************************************************************/
 
+extern uae_u32 REGPARAM2 custom_wget (uaecptr addr );
+
 UWORD PUHRead( UWORD reg, BOOL *handled )
 {
 	UWORD	result;
@@ -490,7 +495,7 @@ UWORD PUHRead( UWORD reg, BOOL *handled )
 		default:
 			// Just carry out the intercepted read operation
 
-			result = ReadWord( address );
+			result = custom_wget ( address );
 			break;
 	}
 
@@ -502,6 +507,8 @@ UWORD PUHRead( UWORD reg, BOOL *handled )
 ** Handle writes **************************************************************
 ******************************************************************************/
 	
+extern bool custom_wput ( uaecptr addr, uae_u32 value);
+
 void PUHWrite( UWORD	reg, UWORD value, BOOL*handled )
 {
 	UWORD* address = (UWORD*) ( (ULONG) pd->m_CustomDirect + reg );
@@ -963,9 +970,14 @@ void PUHWrite( UWORD	reg, UWORD value, BOOL*handled )
 			break;
 
 		default:
-			// Just carry out the intercepted write operation
 
-			WriteWord( address, value );
+			// do the normal stuff.
+			if (custom_wput ( address,  value) == false)
+			{
+
+				// Just carry out the intercepted write operation
+				WriteWord( address, value );
+			}
 			break;
 	}
 }

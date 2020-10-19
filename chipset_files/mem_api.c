@@ -7,16 +7,17 @@
 #include <proto/exec.h>
 #include <proto/dos.h>
 
-#include "uade/sysconfig.h"
-#include "uade/sysdeps.h"
-#include "uade/memory.h"
+#include "uae/sysconfig.h"
+#include "uae/sysdeps.h"
+#include "uae/memory.h"
 
 extern uae_u8 *chipmemory ;
 
 extern bool init_mem();
 extern void cleanup_mem();
-
 extern addrbank nallePuh_bank ;
+
+extern void init_eventtab (void);
 
 BOOL setup_mem_banks()
 {
@@ -30,6 +31,7 @@ BOOL setup_mem_banks()
 	if (init_mem()==FALSE) return FALSE;
 
 	CIA_reset();
+	init_eventtab();
 
 	return TRUE;
 }
@@ -85,6 +87,7 @@ void _bitChgChipByte(char * offset, ULONG bit)
 {
 	Printf("%s:%s:%ld\n",__FILE__,__FUNCTION__,__LINE__);
 	ULONG value = byteget( (ULONG) offset);
+	Printf("offset: %08lx -- bit %ld\n",offset,bit);
 	byteput( (ULONG) offset, value ^ (1L << bit));
 }
 

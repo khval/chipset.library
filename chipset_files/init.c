@@ -58,8 +58,6 @@ extern uint32_t	ahi_frequency;
 struct Task *main_task = NULL;	// main_task is whatever when running from a library
 struct Process *cia_process = NULL;
 
-APTR cia_mx = NULL;
-
 int spawn_count;
 
 bool expunge_tasks = false;
@@ -165,12 +163,7 @@ void close_libs()
 
 	if ( ! IAHI ) IDOS->Printf("%s: Failed to open AHI\n",LIBNAME); 
 
-	if (cia_mx) 
-	{
-		IExec -> FreeSysObject(ASOT_MUTEX, cia_mx); 
-		cia_mx = NULL;
-	}
-	else if (IDOS) IDOS->Printf("%s: Failed to create Mutex\n",LIBNAME);
+	lock_cleanup();
 
 	cleanup_nallepuh();
 
@@ -240,38 +233,11 @@ BOOL init()
 
 	if ( ! init_nallepuh( ahi_mode_id,ahi_frequency ) ) return FALSE;
 
-	cia_mx = (APTR) IExec -> AllocSysObjectTags(ASOT_MUTEX, TAG_DONE);
-	if ( ! cia_mx) return FALSE;
+	if ( ! lock_init() ) return FALSE;
 
 	if (setup_mem_banks() == FALSE) return FALSE;
 
 	return TRUE;
-}
-
-
-
-//int lock_count = 0;
-
-void cia_lock()
-{
-/*
-	IDOS->Printf("CIA lock\n");
-
-	if (lock_count)
-	{
-		IDOS->Printf("is already locked\n");
-		getchar();
-	}
-*/
-	IExec -> MutexObtain(cia_mx);
-//	lock_count++;
-}
-
-void cia_unlock()
-{
-//	IDOS->Printf("CIA unlock\n");
-	IExec->MutexRelease(cia_mx);
-//	lock_count --;
 }
 
 

@@ -33,7 +33,7 @@ TARGET = chipset.library
 # Additional linker libraries
 LIBS = 
 
-INC = -I../ -I./
+INC = -I../ -I./ -I/RAM/t
 
 
 
@@ -45,6 +45,11 @@ nallePuh_srcs = NallePUH/src/Nalle.c \
 		NallePUH/src/api.c \
 		NallePUH/src/PUH.c 
 
+uae_srcs = uae/memory.c \
+		uae/cia.c \
+		uae/blitter.c \
+		uae/custom_mini.c \
+		uae/events.c
 
 # "main" Interface Source Files
 main_SRCS = main/Obtain.c main/Release.c main/allocChip.c main/freeChip.c \
@@ -68,39 +73,47 @@ main_SRCS = main/Obtain.c main/Release.c main/allocChip.c main/freeChip.c \
 	main/spyCIAB.c  \
 	main/setCIATimingAccuracy.c \
 	main/setCIAClockSpeed.c \
+	main/chipWaitBlit.c \
+	main/chipOwnBlitter.c \
+	main/chipDisownBlitter.c \
 	micro_sys/memory.c \
-	uade/cia.c \
-	uade/memory.c \
+	micro_sys/cpu.c \
 	cia_process.c \
 	timer_device.c \
 	spawn.c \
 	mem_api.c \
 	68k_stubs.c \
-	ahi_prefs.c
+	ahi_prefs.c \
+	lock.c \
+	/RAM/t/blit_table.c \
+	/RAM/t/blitfunc.c
 
 # -------------------------------------------------------------
 # Nothing should need changing below this line
 
 SRCS = init.c
 
-OBJS = $(main_SRCS:.c=.o)  $(SRCS:.c=.o) \
-	$(nallePuh_srcs:.c=.o) 
+OBJS = $(main_SRCS:.c=.o)  \
+	$(SRCS:.c=.o) \
+	$(nallePuh_srcs:.c=.o) \
+	$(uae_srcs:.c=.o) 
 
+TOOLS = UAE/tools/genblitter.exe
 
 # Rules for building
-$(TARGET): $(OBJS)
+$(TARGET): $(TOOLS) /RAM/t/blit_table.c $(OBJS)
 	$(CC) $(LINK) -nostartfiles -o $(TARGET) $(OBJS) $(LIBS)
 
 micro_sys/memory.o: micro_sys/memory.h micro_sys/memory.c 
 	$(CC) $(LINK) $(INC) $(OPT) -c $(@:.o=.c) -o $@
 
+micro_sys/%.o:		micro_sys/%.c 
+	gcc  -Wall -O3  $(INC) -Iuae -c  -D__USE_INLINE__ -D__no_stdlib__ $(@:.o=.c) -o $@
+
 main/%.o:		main/%.c 
 	gcc  -Wall -O3  $(INC) $(OPT) -c  -D__USE_INLINE__ -D__no_stdlib__ $(@:.o=.c) -o $@
 
-uade/cia.o:		uade/cia.c 
-	gcc  -Wall -O3  $(INC) $(OPT) -c  -D__USE_INLINE__ -D__no_stdlib__ $(@:.o=.c) -o $@
-
-uade/memory.o:		uade/memory.c 
+uae/%.o:	/RAM/t/blit.h	uae/%.c 
 	gcc  -Wall -O3  $(INC) $(OPT) -c  -D__USE_INLINE__ -D__no_stdlib__ $(@:.o=.c) -o $@
 
 mem_api.o:		mem_api.c 
@@ -112,10 +125,31 @@ mem_api.o:		mem_api.c
 NallePUH/src/%.o: NallePUH/src/%.c
 	gcc  -Wall -O3 $(INC)  -c  $(@:.o=.c) -o $@
 
+/RAM/t/blit.h:	uae/tools/genblitter.exe
+	uae/tools/genblitter.exe > RAM:t/blit.h
+
+/RAM/t/blit_table.c:	uae/tools/genblitter.exe
+	uae/tools/genblitter.exe t > RAM:t/blit_table.c
+
+/RAM/t/blitfunc.h:
+	uae/tools/genblitter.exe h > RAM:t/blitfunc.h
+
+/RAM/t/blitfunc.c:
+	uae/tools/genblitter.exe f > RAM:t/blitfunc.c
+
+/RAM/t/blitfunc.o:	/RAM/t/blitfunc.c
+	gcc  -Wall -O3 $(INC)  -Iuae  -c -o /RAM/t/blitfunc.o /RAM/t/blitfunc.c
+
+/RAM/t/blit_table.o:	/RAM/t/blitfunc.h	uae/tools/genblitter.exe
+	gcc  -Wall -O3 $(INC)  -Iuae  -c -o /RAM/t/blit_table.o /RAM/t/blit_table.c
+
+UAE/tools/genblitter.exe:	uae/tools/genblitter.c uae/tools/blitops.o
+	gcc uae/tools/blitops.o uae/tools/genblitter.c -IUAE/ -o uae/tools/genblitter.exe
+
 
 .PHONY: clean
 clean:
-	$(RM) $(TARGET) $(OBJS)
+	$(RM) $(TARGET) $(OBJS) $(TOOLS)
 
 .PHONY: revision
 revision:

@@ -32,6 +32,9 @@ STATIC CONST APTR main_v1_vectors[] =
     _chipset_spyCIAA,
     _chipset_spyCIAB,
     _chipset_setCIAClockSpeed,
+    _chipset_chipOwnBlitter,
+    _chipset_chipDisownBlitter,
+    _chipset_chipWaitBlit,
     (APTR)-1
 };
 

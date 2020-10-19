@@ -31,14 +31,15 @@
 
 #include "micro_sys/memory.h"
 
-#include "uade/sysconfig.h"
-#include "uade/sysdeps.h"
-#include "uade/memory.h"
+#include "uae/sysconfig.h"
+#include "uae/sysdeps.h"
+#include "uae/memory.h"
 
 struct mem_list mem_list;
 int used_blocks[512];
 
 extern uae_u8 *chipmemory ;
+extern uae_u32 chipmem_mask;
 
 #define AllocVecShared(_size_) AllocVecTags( _size_,  AVT_Type, MEMF_SHARED,  AVT_Alignment,  16, TAG_DONE)
 #define AllocVecChip(_size_) AllocVec( _size_, MEMF_CHIP )
@@ -50,7 +51,9 @@ void grow_mem_list( int n ) {}
 
 bool init_mem() 
 {
+	int size = 2097152; // bytes
 	chipmemory = 0x0;	// Sets the memory offset to chipram
+ 	chipmem_mask = size - 1;
 	return true; 
 }
 
@@ -94,12 +97,15 @@ void grow_mem_list( int n )
 bool init_mem()
 {
 	Printf("%s:%s:%ld\n",__FILE__,__FUNCTION__,__LINE__);
+	uint32_t size = 512 *1024 ; // 0,5 mb
 
 	mem_list.allocated = 0;
 	mem_list.used = 0;
 	mem_list.allocted_tab = NULL;
 
-	chipmemory = (uae_u8 *) AllocVecShared(512 * 1024);	// 0.5 mb 
+	chipmemory = (uae_u8 *) AllocVecShared(size);	// 0.5 mb 
+ 	chipmem_mask = size - 1;
+
 	if (chipmemory == NULL) return false;
 
 	return true;

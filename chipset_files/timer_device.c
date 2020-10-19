@@ -13,7 +13,10 @@ extern int 					timer_device_open;
 
 void init_timer_device()
 {
-	TimerMP = CreateMsgPort();
+//	TimerMP = CreateMsgPort();
+
+	TimerMP = AllocSysObjectTags(ASOT_PORT, TAG_DONE);
+
 	if (!TimerMP) 
 { 
 #ifdef debug
@@ -25,7 +28,7 @@ void init_timer_device()
 	TimerIO = (struct TimeRequest *) CreateIORequest(TimerMP,sizeof(struct TimeRequest));
 	if (!TimerIO)
 	{
-		DeleteMsgPort(TimerMP);
+		FreeSysObject(ASOT_PORT, (APTR) TimerMP);
 #ifdef debug
 		printf("Failed to create io req\n");
 #endif
@@ -55,7 +58,7 @@ void close_timer_device()
 
 	if (TimerMP) 
 	{
-		DeleteMsgPort(TimerMP);
+		FreeSysObject(ASOT_PORT, (APTR) TimerMP);
 		TimerMP = NULL;
 	}
 

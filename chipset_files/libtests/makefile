@@ -3,7 +3,8 @@
 
 main_SRCS = accuracy.c \
 			chipram.c \
-			timeing.c 
+			timeing.c \
+			blit.c
 
 deps = lib.o
 

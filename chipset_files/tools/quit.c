@@ -7,6 +7,8 @@
 
 #define __USE_INLINE__
 
+#include <proto/dos.h>
+
 #include <proto/chipset.h>
 
 struct IntuitionIFace * IIntuition = NULL;
@@ -34,27 +36,12 @@ int main( int args, char *arg[] )
                 return 0;                
         }
 
-	printf("chip ram at: %08x\n",chipAddressToHost(0));
+	bitChgChipByte(0xBFE001,6);
 
-	if (args==2)
-	{
-		printf("%s\n",arg[1]);
+	Delay(20);
 
-		if (strcasecmp(arg[1],"FALSE")==0) quit = 0x00;
-	}
+	bitClrChipByte(0xBFE001,6);
 
-	printf("quit = %x\n",quit);
-
-	writeChipByte(0x00000000, quit);
-
-/*
-        for (;;)        // busy wait
-        {
-                if (1&readChipByte(&(_ciaa ->ciaicr))) continue;                        // Wait for timer expired flag
-                writeChipByte(&(_ciaa ->ciacra),CIAB_LED ^ readChipByte(&(_ciaa ->ciacra)));     // blink light
-                writeChipByte(&(_ciaa ->ciacra),1|readChipByte(&(_ciaa ->ciacra)));             // Restart timer
-        }
-*/
 
         close_libs();
 

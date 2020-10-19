@@ -49,5 +49,8 @@
 #define spyCIAA(Addr) Ichipset->spyCIAA((Addr)) 
 #define spyCIAB(Addr) Ichipset->spyCIAB((Addr)) 
 #define setCIAClockSpeed(us) Ichipset->setCIAClockSpeed((us)) 
+#define chipOwnBlitter() Ichipset->chipOwnBlitter() 
+#define chipDisownBlitter() Ichipset->chipDisownBlitter() 
+#define chipWaitBlit() Ichipset->chipWaitBlit() 
 
 #endif /* INLINE4_CHIPSET_H */

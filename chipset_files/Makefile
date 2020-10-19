@@ -73,6 +73,9 @@ main_SRCS = main/Obtain.c main/Release.c main/allocChip.c main/freeChip.c \
 	main/spyCIAB.c  \
 	main/setCIATimingAccuracy.c \
 	main/setCIAClockSpeed.c \
+	main/chipWaitBlit.c \
+	main/chipOwnBlitter.c \
+	main/chipDisownBlitter.c \
 	micro_sys/memory.c \
 	micro_sys/cpu.c \
 	cia_process.c \

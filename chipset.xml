@@ -97,6 +97,15 @@
 			<arg name="us" type="double"/>
 		</method>
 
+		<method name="chipOwnBlitter" result="void">
+		</method>
+
+		<method name="chipDisownBlitter" result="void">
+		</method>
+
+		<method name="chipWaitBlit" result="void">
+		</method>
+
 	</interface>
 </library>
 

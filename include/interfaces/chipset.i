@@ -37,6 +37,9 @@ STRUCTURE chipsetIFace, InterfaceData_SIZE
 	    FPTR Ichipset_spyCIAA
 	    FPTR Ichipset_spyCIAB
 	    FPTR Ichipset_setCIAClockSpeed
+	    FPTR Ichipset_chipOwnBlitter
+	    FPTR Ichipset_chipDisownBlitter
+	    FPTR Ichipset_chipWaitBlit
 	LABEL chipsetIFace_SIZE
 
 #endif

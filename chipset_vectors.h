@@ -39,4 +39,7 @@ extern void                 VARARGS68K _chipset_bitClrChipByte(struct chipsetIFa
 extern void                 VARARGS68K _chipset_setCIATimingAccuracy(struct chipsetIFace *, int us);
 extern ULONG                VARARGS68K _chipset_spyCIAA(struct chipsetIFace *, ULONG Addr);
 extern ULONG                VARARGS68K _chipset_spyCIAB(struct chipsetIFace *, ULONG Addr);
-extern ULONG                VARARGS68K _chipset_setCIAClockSpeed(struct chipsetIFace *, ULONG us);
+extern void                 VARARGS68K _chipset_setCIAClockSpeed(struct chipsetIFace *, double us);
+extern void                 VARARGS68K _chipset_chipOwnBlitter(struct chipsetIFace *);
+extern void                 VARARGS68K _chipset_chipDisownBlitter(struct chipsetIFace *);
+extern void                 VARARGS68K _chipset_chipWaitBlit(struct chipsetIFace *);

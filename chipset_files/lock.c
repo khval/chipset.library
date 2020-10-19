@@ -4,6 +4,7 @@
 
 APTR cia_mx = NULL;
 APTR event_mx = NULL;
+APTR blitter_mx = NULL;
 
 #define debug_cia_lock_no
 #define debug_event_lock_no
@@ -139,6 +140,9 @@ BOOL lock_init()
 	event_mx = (APTR) IExec -> AllocSysObjectTags(ASOT_MUTEX, TAG_DONE);
 	if ( ! event_mx) return FALSE;
 
+	blitter_mx = (APTR) IExec -> AllocSysObjectTags(ASOT_MUTEX, TAG_DONE);
+	if ( ! blitter_mx) return FALSE;
+
 	return TRUE;
 }
 
@@ -159,4 +163,12 @@ void lock_cleanup()
 		event_mx = NULL;
 	}
 	else if (IDOS) IDOS->Printf("%s: Failed to create event Mutex\n",LIBNAME);
+
+	if (blitter_mx) 
+	{
+		IExec -> FreeSysObject(ASOT_MUTEX, blitter_mx); 
+		blitter_mx = NULL;
+	}
+	else if (IDOS) IDOS->Printf("%s: Failed to create event Mutex\n",LIBNAME);
 }
+
